@@ -1,0 +1,209 @@
+server {
+    listen 443 ssl http2;
+    ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
+    ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
+    server_name  ${DOMAIN};
+    include /etc/nginx/${HTACCESS}.player.htaccess.conf;
+    location / {
+        root /var/www/;
+        try_files /$uri /$uri/ =404;
+    }
+}
+
+server {
+    listen 443 ssl http2;
+    ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
+    ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
+    server_name  ${DR_HOST}.${DOMAIN};
+
+    location /.well-known/ {
+        root /var/www/;
+        try_files /$uri /$uri/ =404;
+    }
+
+    location /dm {
+        rewrite ^(/.*)$ $1 break;
+        proxy_pass http://dungeon-revealer-host/dm;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        add_header Cache-Control "no-cache";
+    }
+
+    location /map {
+        rewrite ^/map(/.*)$ $1 break;
+        proxy_pass http://dungeon-revealer-host/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        add_header Cache-Control "no-cache";
+    }
+
+    location / {
+  	root /var/www/dungeon-revealer/;
+        try_files /$uri /$uri/ @dungeon-revealer;
+    }
+
+    location @dungeon-revealer {
+        proxy_pass http://dungeon-revealer-host;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        add_header Cache-Control "no-cache";
+    }
+
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+}
+
+server {
+    listen 443 ssl http2;
+    ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
+    ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
+    server_name  ${II_HOST}.${DOMAIN};
+
+    location /.well-known/ {
+        root /var/www/;
+        try_files /$uri /$uri/ =404;
+    }
+
+    location = / {
+        try_files /dev/null @improved-initiative;
+    }
+
+    location /p/ {
+        include /etc/nginx/${HTACCESS}.player.htaccess.conf;
+        try_files /$uri /$uri/ @improved-initiative;
+    }
+
+    location /e/ {
+        include /etc/nginx/${HTACCESS}.dm.htaccess.conf;
+        try_files /$uri /$uri/ @improved-initiative;
+    }
+
+    location / {
+  	root /var/www/improved-initiative/;
+        try_files /$uri /$uri/ @improved-initiative;
+    }
+
+    location @improved-initiative {
+        proxy_pass http://improved-initiative-host;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        add_header Cache-Control "no-cache";
+    }
+
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+}
+
+server {
+    listen 443 ssl http2;
+    ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
+    ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
+    server_name  ${PA_HOST}.${DOMAIN};
+
+    location /.well-known/ {
+        root /var/www/;
+        try_files /$uri /$uri/ =404;
+    }
+
+    location = / {
+        include /etc/nginx/${HTACCESS}.dm.htaccess.conf;
+        try_files /dev/null @paragon;
+    }
+
+    location /p/ {
+        include /etc/nginx/${HTACCESS}.player.htaccess.conf;
+        try_files /$uri /$uri/ @paragon;
+    }
+
+    location / {
+  	root /var/www/paragon/;
+        try_files /$uri /$uri/ @paragon;
+    }
+
+    location @paragon {
+        proxy_pass http://paragon-host;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        add_header Cache-Control "no-cache";
+    }
+
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+}
+
+server {
+    listen       80;
+    server_name  ${DOMAIN};
+    location / {
+        root /var/www/;
+        try_files /$uri /$uri/ @redirect;
+    }
+
+    location @redirect {
+        return 301 https://$host$request_uri;
+    }    
+}
+server {
+    listen       80;
+    server_name  ${DR_HOST}.${DOMAIN};
+    location / {
+        root /var/www/;
+        try_files /$uri /$uri/ @redirect;
+    }
+
+    location @redirect {
+        return 301 https://$host$request_uri;
+    }    
+}
+
+server {
+    listen       80;
+    server_name  ${II_HOST}.${DOMAIN};
+
+    location = / {
+        try_files /dev/null @redirect;
+    }
+
+    location / {
+        root /var/www/;
+        try_files /$uri /$uri/ @redirect;
+    }
+
+    location @redirect {
+        return 301 https://$host$request_uri;
+    }    
+}
+
+server {
+    listen       80;
+    server_name  ${PA_HOST}.${DOMAIN};
+
+    location = / {
+        try_files /dev/null @redirect;
+    }
+
+    location / {
+        root /var/www/;
+        try_files /$uri /$uri/ @redirect;
+    }
+
+    location @redirect {
+        return 301 https://$host$request_uri;
+    }    
+}

@@ -1,0 +1,6 @@
+#!/bin/bash
+
+sudo certbot --authenticator webroot --installer nginx -d ${DOMAIN} --webroot-path /var/www/ --agree-tos -m ${DOMAIN_EMAIL} -n
+sudo certbot --authenticator webroot --installer nginx -d ${DR_HOST}.${DOMAIN} --webroot-path /var/www/ --agree-tos -m ${DOMAIN_EMAIL} -n
+sudo certbot --authenticator webroot --installer nginx -d ${II_HOST}.${DOMAIN} --webroot-path /var/www/ --agree-tos -m ${DOMAIN_EMAIL} -n
+sudo certbot --authenticator webroot --installer nginx -d ${PA_HOST}.${DOMAIN} --webroot-path /var/www/ --agree-tos -m ${DOMAIN_EMAIL} -n
