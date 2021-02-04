@@ -1,6 +1,29 @@
 #!/bin/bash
 
-sudo certbot --authenticator webroot --installer nginx -d ${DOMAIN} --webroot-path /var/www/ --agree-tos -m ${DOMAIN_EMAIL} -n
-sudo certbot --authenticator webroot --installer nginx -d ${DR_HOST}.${DOMAIN} --webroot-path /var/www/ --agree-tos -m ${DOMAIN_EMAIL} -n
-sudo certbot --authenticator webroot --installer nginx -d ${II_HOST}.${DOMAIN} --webroot-path /var/www/ --agree-tos -m ${DOMAIN_EMAIL} -n
-sudo certbot --authenticator webroot --installer nginx -d ${PA_HOST}.${DOMAIN} --webroot-path /var/www/ --agree-tos -m ${DOMAIN_EMAIL} -n
+if [ ! -f /etc/letsencrypt/live/${DOMAIN}/cert.pem ]
+then
+  sudo certbot --authenticator webroot --installer nginx -d ${DOMAIN} --webroot-path /var/www/ --agree-tos -m ${DOMAIN_EMAIL} -n
+else
+  sed -i '0,/\/etc\/ssl\/private\/ssl-cert-snakeoil.key;/s/\/etc\/ssl\/private\/ssl-cert-snakeoil.key;/\/etc\/letsencrypt\/live\/${DOMAIN}\/privkey.pem; # managed by Certbot/' nginx/files/conf.d/default.conf.ssl.template
+fi
+
+if [ ! -f /etc/letsencrypt/live/${DR_HOST}.${DOMAIN}/cert.pem ]
+then
+  sudo certbot --authenticator webroot --installer nginx -d ${DR_HOST}.${DOMAIN} --webroot-path /var/www/ --agree-tos -m ${DOMAIN_EMAIL} -n
+else
+  sed -i '0,/\/etc\/ssl\/private\/ssl-cert-snakeoil.key;/s/\/etc\/ssl\/private\/ssl-cert-snakeoil.key;/\/etc\/letsencrypt\/live\/${DR_HOST}.${DOMAIN}\/privkey.pem; # managed by Certbot/' nginx/files/conf.d/default.conf.ssl.template
+fi
+
+if [ ! -f /etc/letsencrypt/live/${II_HOST}.${DOMAIN}/cert.pem ]
+then
+  sudo certbot --authenticator webroot --installer nginx -d ${II_HOST}.${DOMAIN} --webroot-path /var/www/ --agree-tos -m ${DOMAIN_EMAIL} -n
+else
+  sed -i '0,/\/etc\/ssl\/private\/ssl-cert-snakeoil.key;/s/\/etc\/ssl\/private\/ssl-cert-snakeoil.key;/\/etc\/letsencrypt\/live\/${II_HOST}.${DOMAIN}\/privkey.pem; # managed by Certbot/' nginx/files/conf.d/default.conf.ssl.template
+fi
+
+if [ ! -f /etc/letsencrypt/live/${PA_HOST}.${DOMAIN}/cert.pem ]
+then
+  sudo certbot --authenticator webroot --installer nginx -d ${PA_HOST}.${DOMAIN} --webroot-path /var/www/ --agree-tos -m ${DOMAIN_EMAIL} -n
+else
+  sed -i '0,/\/etc\/ssl\/private\/ssl-cert-snakeoil.key;/s/\/etc\/ssl\/private\/ssl-cert-snakeoil.key;/\/etc\/letsencrypt\/live\/${PA_HOST}.${DOMAIN}\/privkey.pem; # managed by Certbot/' nginx/files/conf.d/default.conf.ssl.template
+fi

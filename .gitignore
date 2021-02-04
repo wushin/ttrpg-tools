@@ -1,8 +1,5 @@
 .env
 nginx/certbot.sh
 nginx/files/conf.d/default.conf
-nginx/files/ssl.conf
-nginx/files/ssl.domain.conf
-nginx/files/ssl.dr.conf
-nginx/files/ssl.ii.conf
-nginx/files/ssl.pa.conf
+*.conf
+*.bak

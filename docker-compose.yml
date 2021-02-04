@@ -24,6 +24,7 @@ services:
       - DR_HOST
       - II_HOST
       - PA_HOST
+      - DM_HOST
       - SSL
     ports:
       - '80:80'
@@ -57,6 +58,7 @@ services:
     environment:
       - PC_PASSWORD=${DR_USER_PASS}
       - DM_PASSWORD=${DR_DM_PASS}
+      - PUBLIC_URL="/map"
     volumes:
       - ./dungeon-revealer/data:/usr/src/app/data
       - ./dungeon-revealer/build/:/usr/src/app/build/:rw
@@ -79,7 +81,7 @@ services:
     volumes:
       - ./improved-initiative/public-tmp/:/usr/src/app/public-tmp:rw
     environment:
-      - NODE_ENV=production
+      - NODE_ENV
       - PORT=4000
       - DB_CONNECTION_STRING=mongodb://mongo:27017/
     ports:
@@ -93,8 +95,8 @@ services:
     container_name: mongo
     restart: always
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=example
+      - MONGO_INITDB_ROOT_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD
     volumes:
       - ./mongo/data:/data/db:rw
     ports:

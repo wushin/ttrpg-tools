@@ -1,0 +1,18 @@
+GPLv2: Licensed under GNU General Public License version2.
+http://www.gnu.org/licenses/gpl-2.0.html
+See also the GPL file.
+
+CC BY-SA 3.0: Licensed under Creative Commons Attribution-ShareAlike 3.0 Unported.
+http://creativecommons.org/licenses/by-sa/3.0/
+See also the CC BY-SA 3.0 file.
+
+You must include a link to http://ttrpg-tools.org in your credits along with the author's name.
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+# Submodules
+    dungeon-revealer/code               (dungeon-revealer team)             (ISC License (ISC))
+    improved-initiative/code            (Evan Bailey)                       (MIT license)
+    paragon/code                        (Evan Bailey)                       (MIT license)
+# Improved Initiative Content
+    D&D Source material                 (Wizards of the Coast)              (Open Gaming License Version 1.0a)

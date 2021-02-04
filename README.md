@@ -32,17 +32,20 @@ TTRPG Tools
   * `sudo docker exec nginx bash /var/www/certbot.sh`
 
 ## Env file options
+* `NODE_ENV` - `production` or `development` which Improved Initiative build to use
 * `DOMAIN` - The domain all the hosts will bind too
+* `DOMAIN_EMAIL` - The Email address Let's Encrypt will notify you when the ssl is about to expire
 * `DR_HOST` - The hostname for Dungeon Revealer
 * `II_HOST` - The hostname for Improved Initiative
 * `PA_HOST` - The hostname for Paragon
-* `DOMAIN_EMAIL` - The Email address Let's Encrypt will notify you when the ssl is about to expire
 * `SSL` - `nossl` to not use ssl and `ssl` to use ssl
 * `HTACCESS` - `yes` to set-up auth with separate player and gm password and `no` to not set-up auth
 * `HT_USER` - The name the players will use to login
 * `DR_USER_PASS` - The password the players will use to login
 * `HT_DM_USER` - The name the DM will use to login
 * `DR_DM_PASS` - The password the DM will use to login
+* `MONGO_INITDB_ROOT_USERNAME` - Name for root user of Mongo db
+* `MONGO_INITDB_ROOT_PASSWORD` - Password for root user of Mongo db
 
 ## Using localhost
 * If you want to use localhost or the machine's IP add entries into your hosts file. 
@@ -75,4 +78,3 @@ TTRPG Tools
   * `sudo docker system prune -a -f`
 * Remove Volumes
   * `sudo docker volume prune -f`
-
