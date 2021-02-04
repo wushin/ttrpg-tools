@@ -1,4 +1,5 @@
 .env
+.certbot.lock
 nginx/certbot.sh
 nginx/files/conf.d/default.conf
 *.conf
