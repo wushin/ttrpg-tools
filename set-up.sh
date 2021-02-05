@@ -1,5 +1,14 @@
 #!/bin/bash
 
+if [ ! $1 ] || [ $1 == "help" ]
+then
+  echo "help    - This menu"
+  echo "build   - Build TTRPG Tools"
+  echo "restart - Restart all containers"
+  echo "ssl     - Runs certbot script"
+  exit 1
+fi
+
 unameOut="$(uname -s)"
 case "${unameOut}" in
   Linux*)     machine=Linux;;

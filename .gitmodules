@@ -7,3 +7,6 @@
 [submodule "paragon"]
 	path = paragon/code
 	url = git@github.com:cynicaloptimist/paragon.git
+[submodule "dnd-map"]
+	path = dnd-map
+	url = git@github.com:karlyanelson/dnd-map.git

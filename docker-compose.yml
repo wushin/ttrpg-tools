@@ -39,6 +39,7 @@ services:
       - ./dungeon-revealer/build/:/var/www/dungeon-revealer/:rw,cached
       - ./improved-initiative/public-tmp/:/var/www/improved-initiative/:rw
       - ./paragon/build/:/var/www/paragon/:rw
+      - ./dnd-map/:/var/www/dnd-map/:rw
     restart: always
     depends_on:
       - dungeon-revealer
