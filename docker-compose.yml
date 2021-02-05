@@ -16,6 +16,7 @@ services:
       network: host
     user: 1000:1000
     container_name: nginx
+    restart: always
     command: /bin/bash -c "envsubst \"`for v in $$(compgen -v);do printf '$${%s} ' $$v;done`'\" < /etc/nginx/conf.d/default.conf.${SSL}.template > /etc/nginx/conf.d/default.conf && envsubst \"`for v in $$(compgen -v);do printf '$${%s} ' $$v;done`'\" < /var/www/certbot.sh.template > /var/www/certbot.sh && bash /var/www/certbot.sh && sudo nginx -g 'daemon off;'"
     environment:
       - HTACCESS
@@ -26,13 +27,6 @@ services:
       - PA_HOST
       - DM_HOST
       - SSL
-    ports:
-      - '80:80'
-      - '443:443'
-    links:
-      - dungeon-revealer:3000
-      - improved-initiative:4000
-      - paragon:3000
     volumes:
       - ./nginx/files/:/etc/nginx/
       - ./nginx/ssl/:/etc/letsencrypt/
@@ -40,21 +34,29 @@ services:
       - ./improved-initiative/public-tmp/:/var/www/improved-initiative/:rw
       - ./paragon/build/:/var/www/paragon/:rw
       - ./dnd-map/:/var/www/dnd-map/:rw
-    restart: always
+    ports:
+      - '80:80'
+      - '443:443'
+    links:
+      - dungeon-revealer:3000
+      - improved-initiative:4000
+      - paragon:3000
+    networks:
+      - web-network
     depends_on:
       - dungeon-revealer
       - improved-initiative
       - paragon
-    networks:
-      - web-network
 
   dungeon-revealer:
     build:
       context: ./dungeon-revealer/
       dockerfile: Dockerfile
       network: host
+    user: 1000:1000
     working_dir: /usr/src/app
     container_name: dungeon-revealer
+    restart: always
     command: /bin/sh -c "cp -a ./build-tmp/* ./build/ && node server-build/index.js"
     environment:
       - PC_PASSWORD=${DR_USER_PASS}
@@ -63,8 +65,6 @@ services:
     volumes:
       - ./dungeon-revealer/data:/usr/src/app/data
       - ./dungeon-revealer/build/:/usr/src/app/build/:rw
-    restart: always
-    user: 1000:1000
     networks:
       - web-network
 
@@ -73,19 +73,19 @@ services:
       context: ./improved-initiative/
       dockerfile: Dockerfile
       network: host
-    container_name: improved-initiative
+    user: 1000:1000
     working_dir: /usr/src/app
-    command: /bin/bash -c "cp -a ./public/* ./public-tmp/ && node server/server.js"
+    container_name: improved-initiative
     restart: always
-    volumes:
-      - ./improved-initiative/public-tmp/:/usr/src/app/public-tmp:rw
+    command: /bin/bash -c "cp -a ./public/* ./public-tmp/ && node server/server.js"
     environment:
       - NODE_ENV
       - PORT=4000
       - DB_CONNECTION_STRING=mongodb://mongo:27017/
+    volumes:
+      - ./improved-initiative/public-tmp/:/usr/src/app/public-tmp:rw
     links:
       - mongo:27017
-    user: 1000:1000
     networks:
       - web-network
 
@@ -106,12 +106,12 @@ services:
       context: ./paragon/
       dockerfile: Dockerfile
       network: host
-    container_name: paragon
-    command: /bin/sh -c "export PATH=$PATH:/home/node/.npm-global/bin/ && cp -a ./build-tmp/* ./build/ && serve -s build -l 3000"
+    user: 1000:1000
     working_dir: /usr/src/app
+    container_name: paragon
     restart: always
+    command: /bin/sh -c "export PATH=$PATH:/home/node/.npm-global/bin/ && cp -a ./build-tmp/* ./build/ && serve -s build -l 3000"
     volumes:
       - ./paragon/build/:/usr/src/app/build/:rw
-    user: 1000:1000
     networks:
       - web-network
