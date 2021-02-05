@@ -122,14 +122,3 @@ server {
         root   /usr/share/nginx/html;
     }
 }
-
-server {
-    listen       80;
-    server_name  ${DM_HOST}.${DOMAIN};
-    include /etc/nginx/${HTACCESS}.player.htaccess.conf;
-
-    location / {
-        root /var/www/dnd-map/;
-        try_files /$uri /$uri/ =404;
-    }
-}
