@@ -36,8 +36,7 @@ fi
 
 if [ $SSL == "ssl" ] && [ ! -f .certbot.lock ] || [ $1 == "ssl" ]
 then
-  sudo docker exec nginx bash /var/www/certbot.sh
-  touch .certbot.lock
+  sudo docker exec nginx bash /var/www/certbot.sh && touch .certbot.lock
   sudo docker-compose restart nginx
 fi
 
