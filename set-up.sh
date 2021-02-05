@@ -36,8 +36,27 @@ fi
 
 if [ $SSL == "ssl" ] && [ ! -f .certbot.lock ] || [ $1 == "ssl" ]
 then
+  echo -e "[ \e[33mGenerating Certs\e[0m ]"
+  network_name=`sudo docker network ls --format "{{.Name}}" | grep web-network`
+  echo -en "[ \e[33mWaiting for nginx to come up\e[0m ]"
+  while [ "`sudo docker inspect -f {{.State.Running}} nginx 2> /dev/null`" != "true" ]
+  do
+    echo -en "."
+    sleep 3
+  done
+  echo -e "[ \e[32mNginx Up\e[0m ]"
+  nginx_ip=`sudo docker inspect -f '{{ $network := index .NetworkSettings.Networks "'$network_name'" }}{{ $network.IPAddress}}' nginx 2> /dev/null`
+  echo -en "[ \e[33mWaiting for nginx to have an IP\e[0m ]"
+  while [ -z "$nginx_ip" ]
+  do
+    echo -en "."
+    sleep 3
+    nginx_ip=`sudo docker inspect -f '{{ $network := index .NetworkSettings.Networks "'$network_name'" }}{{ $network.IPAddress}}' nginx 2> /dev/null`
+  done
+  echo -e "[ \e[32mNginx IP Found\e[0m ]"
   sudo docker exec nginx bash /var/www/certbot.sh && touch .certbot.lock
   sudo docker-compose restart nginx
+  echo -e "[ \e[32mGenerated Certs\e[0m ]"
 fi
 
 echo ""
