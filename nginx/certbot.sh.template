@@ -1,35 +1,54 @@
 #!/bin/bash
 
-echo -e "[ \e[33mInstalling SSL\e[0m ]"
-if [ ! -f /etc/letsencrypt/live/${DOMAIN}/cert.pem ]
+NGINX_RUNNING=`ps -ef | grep "sudo nginx -g daemon off" | grep -v grep | grep -v envsubst | wc -l`
+if [ ! -f /etc/letsencrypt/live/${DOMAIN}/cert.pem ] && [ $NGINX_RUNNING == "1" ]
 then
+  echo -e "[ \e[33mInstalling SSL ${DOMAIN}\e[0m ]"
   sudo certbot --authenticator webroot --installer nginx -d ${DOMAIN} --webroot-path /var/www/ --agree-tos -m ${DOMAIN_EMAIL} -n
-else
+  echo -e "[ \e[32mSSL Installed ${DOMAIN}\e[0m ]"
+elif [ $NGINX_RUNNING == "1" ]
+then
+  echo -e "[ \e[33mInstalling SSL ${DOMAIN}\e[0m ]"
   sed -i '0,/\/etc\/ssl\/private\/ssl-cert-snakeoil.key;/s/\/etc\/ssl\/private\/ssl-cert-snakeoil.key;/\/etc\/letsencrypt\/live\/${DOMAIN}\/privkey.pem; # managed by Certbot/' /etc/nginx/conf.d/default.conf
   sed -i '0,/\/etc\/ssl\/certs\/ssl-cert-snakeoil.pem;/s/\/etc\/ssl\/certs\/ssl-cert-snakeoil.pem;/\/etc\/letsencrypt\/live\/${DOMAIN}\/fullchain.pem; # managed by Certbot/' /etc/nginx/conf.d/default.conf
+  echo -e "[ \e[32mSSL Installed ${DOMAIN}\e[0m ]"
 fi
 
-if [ ! -f /etc/letsencrypt/live/${DR_HOST}.${DOMAIN}/cert.pem ]
+if [ ! -f /etc/letsencrypt/live/${DR_HOST}.${DOMAIN}/cert.pem ] && [ $NGINX_RUNNING == "1" ]
 then
+  echo -e "[ \e[33mInstalling SSL ${DR_HOST}.${DOMAIN}\e[0m ]"
   sudo certbot --authenticator webroot --installer nginx -d ${DR_HOST}.${DOMAIN} --webroot-path /var/www/ --agree-tos -m ${DOMAIN_EMAIL} -n
-else
+  echo -e "[ \e[32mSSL Installed ${DR_HOST}.${DOMAIN}\e[0m ]"
+elif [ $NGINX_RUNNING == "1" ]
+then
+  echo -e "[ \e[33mInstalling SSL ${DR_HOST}.${DOMAIN}\e[0m ]"
   sed -i '0,/\/etc\/ssl\/private\/ssl-cert-snakeoil.key;/s/\/etc\/ssl\/private\/ssl-cert-snakeoil.key;/\/etc\/letsencrypt\/live\/${DR_HOST}.${DOMAIN}\/privkey.pem; # managed by Certbot/' /etc/nginx/conf.d/default.conf
   sed -i '0,/\/etc\/ssl\/certs\/ssl-cert-snakeoil.pem;/s/\/etc\/ssl\/certs\/ssl-cert-snakeoil.pem;/\/etc\/letsencrypt\/live\/${DR_HOST}.${DOMAIN}\/fullchain.pem; # managed by Certbot/' /etc/nginx/conf.d/default.conf
+  echo -e "[ \e[32mSSL Installed ${DR_HOST}.${DOMAIN}\e[0m ]"
 fi
 
-if [ ! -f /etc/letsencrypt/live/${II_HOST}.${DOMAIN}/cert.pem ]
+if [ ! -f /etc/letsencrypt/live/${II_HOST}.${DOMAIN}/cert.pem ] && [ $NGINX_RUNNING == "1" ]
 then
+  echo -e "[ \e[33mInstalling SSL ${II_HOST}.${DOMAIN}\e[0m ]"
   sudo certbot --authenticator webroot --installer nginx -d ${II_HOST}.${DOMAIN} --webroot-path /var/www/ --agree-tos -m ${DOMAIN_EMAIL} -n
-else
+  echo -e "[ \e[32mSSL Installed ${II_HOST}.${DOMAIN}\e[0m ]"
+elif [ $NGINX_RUNNING == "1" ]
+then
+  echo -e "[ \e[33mInstalling SSL ${II_HOST}.[0m ]"
   sed -i '0,/\/etc\/ssl\/private\/ssl-cert-snakeoil.key;/s/\/etc\/ssl\/private\/ssl-cert-snakeoil.key;/\/etc\/letsencrypt\/live\/${II_HOST}.${DOMAIN}\/privkey.pem; # managed by Certbot/' /etc/nginx/conf.d/default.conf
   sed -i '0,/\/etc\/ssl\/certs\/ssl-cert-snakeoil.pem;/s/\/etc\/ssl\/certs\/ssl-cert-snakeoil.pem;/\/etc\/letsencrypt\/live\/${II_HOST}.${DOMAIN}\/fullchain.pem; # managed by Certbot/' /etc/nginx/conf.d/default.conf
+  echo -e "[ \e[32mSSL Installed ${II_HOST}.[0m ]"
 fi
 
-if [ ! -f /etc/letsencrypt/live/${PA_HOST}.${DOMAIN}/cert.pem ]
+if [ ! -f /etc/letsencrypt/live/${PA_HOST}.${DOMAIN}/cert.pem ] && [ $NGINX_RUNNING == "1" ]
 then
+  echo -e "[ \e[33mInstalling SSL ${PA_HOST}.${DOMAIN}\e[0m ]"
   sudo certbot --authenticator webroot --installer nginx -d ${PA_HOST}.${DOMAIN} --webroot-path /var/www/ --agree-tos -m ${DOMAIN_EMAIL} -n
-else
+  echo -e "[ \e[32mSSL Installed ${PA_HOST}.${DOMAIN}\e[0m ]"
+elif [ $NGINX_RUNNING == "1" ]
+then
+  echo -e "[ \e[33mInstalling SSL ${PA_HOST}.${DOMAIN}\e[0m ]"
   sed -i '0,/\/etc\/ssl\/private\/ssl-cert-snakeoil.key;/s/\/etc\/ssl\/private\/ssl-cert-snakeoil.key;/\/etc\/letsencrypt\/live\/${PA_HOST}.${DOMAIN}\/privkey.pem; # managed by Certbot/' /etc/nginx/conf.d/default.conf
   sed -i '0,/\/etc\/ssl\/certs\/ssl-cert-snakeoil.pem;/s/\/etc\/ssl\/certs\/ssl-cert-snakeoil.pem;/\/etc\/letsencrypt\/live\/${PA_HOST}.${DOMAIN}\/fullchain.pem; # managed by Certbot/' /etc/nginx/conf.d/default.conf
+  echo -e "[ \e[32mSSL Installed ${PA_HOST}.${DOMAIN}\e[0m ]"
 fi
-echo -e "[ \e[32mSSL Installed\e[0m ]"
