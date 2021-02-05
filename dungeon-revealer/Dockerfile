@@ -1,24 +1,29 @@
-FROM node:12-alpine as base
+FROM node:14 as base
 ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
 
 # add build tools for other architectures
 # subsequent builds should cache this layer
-RUN apk add make g++ python
+RUN apt-get update && apt-get install make g++ python
+RUN mkdir -p /usr/src/build/
+RUN mkdir -p /usr/src/app/
+COPY ./code/ /usr/src/build/
+RUN chown node:node -R /usr/src/build/
+RUN chown node:node -R /usr/src/app/
 
 FROM base as dependency-builder
 ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
 
+USER node
 WORKDIR /usr/src/build
 
 RUN echo "unsafe-perm = true" > .npmrc
-
-COPY ./code/ .
 
 RUN npm install
 
 FROM dependency-builder as application-builder
 ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
 
+USER node
 ARG SKIP_BUILD
 
 RUN if [ "$SKIP_BUILD" = "true" ]; then echo "SKIP BUILD"; else npm run build; fi
@@ -26,14 +31,15 @@ RUN if [ "$SKIP_BUILD" = "true" ]; then echo "SKIP BUILD"; else npm run build; f
 FROM dependency-builder as production-dependency-builder
 
 # then we remove all dependencies we no longer need
+USER node
 RUN npm prune --production
 
-FROM node:12-alpine as final
+FROM node:14 as final
 ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
 
 # Create app directory
+USER node
 WORKDIR /usr/src/app
-
 # Copy app source
 COPY --from=application-builder /usr/src/build/build /usr/src/app/build-tmp
 COPY --from=application-builder /usr/src/build/server-build /usr/src/app/server-build

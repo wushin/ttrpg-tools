@@ -10,11 +10,10 @@ TTRPG Tools
   * [Working in containers](https://github.com/wushin/ttrpg-tools#working-in-containers)
 
 ## About
-* A easy to install set of tools to help DM TTRPGs
-  * [Dungeon Revealer](https://github.com/dungeon-revealer/dungeon-revealer) - Uses images to display dungeon maps with fog of war
+* A easy to install set of Table Top RPG Tools to help DM
+  * [Dungeon Revealer](https://github.com/dungeon-revealer/dungeon-revealer) - Uses images to display dungeon and battle maps with fog of war
   * [Improved Initiative](https://github.com/cynicaloptimist/improved-initiative) - Combat tracker for Dungeons and Dragons (D&D) 5th Edition
   * [Paragon](https://github.com/cynicaloptimist/paragon) - Configurable DM screen to use when running a tabletop RPGs
-  * [DnD Map](https://github.com/karlyanelson/dnd-map) - A simple Dungeons and Dragons virtual tabletop. 
   * [Let's Encrypt](https://letsencrypt.org/) - A free ssl service
 
 ## Prerequisites:
