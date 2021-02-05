@@ -30,7 +30,7 @@ TTRPG Tools
   * Make build
     * `make install`
   * Scripted Build
-    * Run `bash set-up.sh build`
+    * `bash set-up.sh build`
   * Manual Build
     * Build and Bring the docker-compose environment up
       * `sudo docker-compose up -d --build`
@@ -77,7 +77,7 @@ TTRPG Tools
 
 ## Working in containers
 * Login to container
-  * `sudo docker exec -it [<container_hostname>] (ba)sh`
+  * `sudo docker exec -it [<container_hostname>] bash`
 * Get logs of container
   * `sudo docker-compose logs -f [<container_name>]`
 * Show all containers
