@@ -64,8 +64,6 @@ services:
       - ./dungeon-revealer/data:/usr/src/app/data
       - ./dungeon-revealer/build/:/usr/src/app/build/:rw
     restart: always
-    ports:
-      - '3000'
     user: 1000:1000
     networks:
       - web-network
@@ -85,8 +83,8 @@ services:
       - NODE_ENV
       - PORT=4000
       - DB_CONNECTION_STRING=mongodb://mongo:27017/
-    ports:
-      - '4000'
+    links:
+      - mongo:27017
     user: 1000:1000
     networks:
       - web-network
@@ -100,8 +98,6 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD
     volumes:
       - ./mongo/data:/data/db:rw
-    ports:
-      - '27017'
     networks:
       - web-network
 
@@ -116,8 +112,6 @@ services:
     restart: always
     volumes:
       - ./paragon/build/:/usr/src/app/build/:rw
-    ports:
-      - '3000'
     user: 1000:1000
     networks:
       - web-network
