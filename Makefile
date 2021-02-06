@@ -12,3 +12,8 @@ ssl:
 
 destroy:
 	bash destroy.sh
+
+uninstall:
+	bash destroy.sh
+	rm -f .certbot.lock
+	rm -fR ./nginx/ssl/*
