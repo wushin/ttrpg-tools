@@ -34,6 +34,7 @@ then
   sudo docker-compose restart
 fi
 
+HTTP="http://";
 if [ $SSL == "ssl" ] && [ ! -f .certbot.lock ] || [ $1 == "ssl" ]
 then
   echo -e "[ \e[33mGenerating Certs\e[0m ]"
@@ -57,11 +58,12 @@ then
   sudo docker exec nginx bash /var/www/certbot.sh && touch .certbot.lock
   sudo docker-compose restart nginx
   echo -e "[ \e[32mGenerated Certs\e[0m ]"
+  HTTP="https://";
 fi
 
 echo ""
 echo -e "[ \e[35mAll ready to use\e[0m ]"
-echo "Improved Initiative : "$II_HOST"."$DOMAIN;
-echo "Dungeon Revealer    : "$DR_HOST"."$DOMAIN;
-echo "Paragon             : "$PA_HOST"."$DOMAIN;
+echo "Improved Initiative : "$HTTP""$II_HOST"."$DOMAIN;
+echo "Dungeon Revealer    : "$HTTP""$DR_HOST"."$DOMAIN"/map";
+echo "Paragon             : "$HTTP""$PA_HOST"."$DOMAIN;
 echo ""
