@@ -1,3 +1,9 @@
+plan:
+	terraform plan
+
+apply:
+	terraform apply
+
 install:
 	bash ./set-up.sh build
 
