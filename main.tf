@@ -1,73 +1,53 @@
 provider "aws" {
   region = "us-east-2"
+  profile = "ttrpg"
 }
 
 locals {
-  public_key_filename  = "${var.sshpath}/ttrpgtools.pub"
-  private_key_filename = "${var.sshpath}/ttrpgtools.pem"
+  public_key_filename  = "${var.sshpath}/${var.public_key_name}"
+  private_key_filename = "${var.sshpath}/${var.private_key_name}"
 }
 
-module "key_pair" {
-  source = "terraform-aws-modules/key-pair/aws"
-  public_key = tls_private_key.generated.public_key_openssh
-}
-
-resource "tls_private_key" "generated" {
-  algorithm = "RSA"
-}
-
-resource "aws_key_pair" "generated" {
-  key_name   = "ttrpgserve"
-  public_key = tls_private_key.generated.public_key_openssh
-
-  lifecycle {
-    ignore_changes = [key_name]
-  }
-}
-
-resource "local_file" "public_key_openssh" {
-  count    = var.sshpath != "" ? 1 : 0
-  content  = tls_private_key.generated.public_key_openssh
-  filename = local.public_key_filename
-}
-
-resource "local_file" "private_key_pem" {
-  count    = var.sshpath != "" ? 1 : 0
-  content  = tls_private_key.generated.private_key_pem
-  filename = local.private_key_filename
-}
-
-resource "null_resource" "chmod_pub" {
-  count      = var.sshpath != "" ? 1 : 0
-  depends_on = [local_file.public_key_openssh]
-
-  triggers = {
-    key = tls_private_key.generated.public_key_openssh
-  }
-
-  provisioner "local-exec" {
-    command = "chmod 600 ${local.public_key_filename}"
-  }
-}
-
-resource "null_resource" "chmod_pem" {
-  count      = var.sshpath != "" ? 1 : 0
-  depends_on = [local_file.private_key_pem]
-
-  triggers = {
-    key = tls_private_key.generated.private_key_pem
-  }
-
-  provisioner "local-exec" {
-    command = "chmod 600 ${local.private_key_filename}"
-  }
+resource "aws_key_pair" "imported" {
+  key_name   = var.private_key_name
+  public_key = file(local.public_key_filename)
 }
 
 resource "aws_instance" "ttrpgserver" {
-  ami           = "ami-05f5cd6454a382a70"
-  instance_type = "t2.micro"
-  key_name = "ttrpgserve"
+  ami                    = "ami-05f5cd6454a382a70"
+  instance_type          = "t2.micro"
+  key_name               = var.private_key_name
   vpc_security_group_ids = [aws_security_group.instance.id]
+
+  connection {
+    type        = "ssh"
+    user        = "admin"
+    host        = aws_instance.ttrpgserver.public_ip
+    private_key = file(local.private_key_filename)
+  }
+
+  provisioner "file" {
+    source      = local.private_key_filename
+    destination = "/home/admin/.ssh/${var.private_key_name}"
+  }
+
+  provisioner "file" {
+    source      = "./.env"
+    destination = "/home/admin/.env"
+  }
+
+  provisioner "file" {
+    source      = "./linux_install.sh"
+    destination = "/tmp/linux_install.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/linux_install.sh",
+      "chmod 600 /home/admin/.ssh/${var.private_key_name}",
+      "/tmp/linux_install.sh ${var.private_key_name}",
+    ]
+  }
 
   tags = {
     Name = "ttrpgtools-serve"

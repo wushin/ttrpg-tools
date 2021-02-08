@@ -7,3 +7,5 @@ nginx/files/conf.d/default.conf
 .terraform.lock.hcl
 .terraform/*
 terraform.tfstate*
+.terraform.tfstate.*
+aws-build.tfvars
