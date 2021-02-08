@@ -5,7 +5,7 @@ nginx/files/conf.d/default.conf
 *.conf
 *.bak
 .terraform.lock.hcl
-.terraform/*
+*/*/.terraform/*
 terraform.tfstate*
 .terraform.tfstate.*
 aws-build.tfvars

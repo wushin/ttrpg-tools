@@ -13,44 +13,16 @@ resource "aws_key_pair" "imported" {
   public_key = file(local.public_key_filename)
 }
 
-resource "aws_s3_bucket" "ttrpg_bucket" {
-  bucket = "ttrpg-terraform-bucket"
-  acl = "private"
-  versioning {
-    enabled = true
-  }
-
-  tags = {
-    Name = "ttrpg-terraform-bucket"
-  }
-}
-
-resource "aws_s3_bucket_object" "letsencrypt" {
-    bucket = aws_s3_bucket.ttrpg_bucket.id
-    acl    = "private"
-    key    = "letsencrypt/"
-    source = "/dev/null"
-}
-
-resource "aws_s3_bucket_object" "mongo_data" {
-    bucket = aws_s3_bucket.ttrpg_bucket.id
-    acl    = "private"
-    key    = "mongo_data/"
-    source = "/dev/null"
-}
-
-resource "aws_s3_bucket_object" "dr_data" {
-    bucket = aws_s3_bucket.ttrpg_bucket.id
-    acl    = "private"
-    key    = "dr_data/"
-    source = "/dev/null"
-}
-
 resource "aws_instance" "ttrpgserver" {
   ami                    = "ami-05f5cd6454a382a70"
-  instance_type          = "t2.micro"
+  instance_type          = var.instance_type
   key_name               = var.private_key_name
   vpc_security_group_ids = [aws_security_group.instance.id]
+
+  root_block_device {
+    volume_size           = 20
+    delete_on_termination = false
+  }
 
   connection {
     type        = "ssh"
@@ -65,17 +37,17 @@ resource "aws_instance" "ttrpgserver" {
   }
 
   provisioner "file" {
-    source      = "./.env"
+    source      = "../../.env"
     destination = "/home/admin/.env"
   }
 
   provisioner "file" {
-    source      = "./linux_install.sh"
+    source      = "../../linux_install.sh"
     destination = "/home/admin/linux_install.sh"
   }
 
   provisioner "file" {
-    source      = "./update_dns.sh"
+    source      = "../../update_dns.sh"
     destination = "/home/admin/update_dns.sh"
   }
 

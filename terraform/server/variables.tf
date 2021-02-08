@@ -2,6 +2,10 @@ variable "aws_region" {
   description = "Region services should spawn in"
   type        = string
 }
+variable "instance_type" {
+  description = "What size of ec2 server to run on"
+  type        = string
+}
 variable "sshpath" {
   description = "Path to a directory where the public and private SSH key will be stored."
   type        = string
