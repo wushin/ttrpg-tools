@@ -16,4 +16,5 @@ echo -e "  IdentityFile /home/admin/.ssh/$1" >> ~/.ssh/config
 git clone --recursive git@github.com:wushin/ttrpg-tools.git
 mv ~/.env ~/ttrpg-tools/
 cd ./ttrpg-tools
+bash ~/update_dns.sh $2
 #make build

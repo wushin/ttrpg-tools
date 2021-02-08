@@ -38,14 +38,19 @@ resource "aws_instance" "ttrpgserver" {
 
   provisioner "file" {
     source      = "./linux_install.sh"
-    destination = "/tmp/linux_install.sh"
+    destination = "/home/admin/linux_install.sh"
+  }
+
+  provisioner "file" {
+    source      = "./update_dns.sh"
+    destination = "/home/admin/update_dns.sh"
   }
 
   provisioner "remote-exec" {
     inline = [
-      "chmod +x /tmp/linux_install.sh",
+      "chmod +x /home/admin/linux_install.sh",
       "chmod 600 /home/admin/.ssh/${var.private_key_name}",
-      "/tmp/linux_install.sh ${var.private_key_name}",
+      "/home/admin/linux_install.sh ${var.private_key_name} ${var.domain_service}",
     ]
   }
 

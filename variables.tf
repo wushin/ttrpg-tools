@@ -13,3 +13,7 @@ variable "public_key_name" {
 variable "ssh_key_algorithm" {
   default     = "RSA"
 }
+variable "domain_service" {
+  description = "Which DYNDNS client or update method to use"
+  type        = string
+}

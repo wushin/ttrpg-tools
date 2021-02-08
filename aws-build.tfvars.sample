@@ -1,3 +1,4 @@
 sshpath = "/Path/To/Ssh/Keys"
 private_key_name = "nameofkey"
 public_key_name = "nameofkey.pub"
+domain_service = "google"
