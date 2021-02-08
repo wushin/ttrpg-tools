@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "us-east-2"
+  region = var.aws_region
   profile = "ttrpg"
 }
 
@@ -11,6 +11,39 @@ locals {
 resource "aws_key_pair" "imported" {
   key_name   = var.private_key_name
   public_key = file(local.public_key_filename)
+}
+
+resource "aws_s3_bucket" "ttrpg_bucket" {
+  bucket = "ttrpg-terraform-bucket"
+  acl = "private"
+  versioning {
+    enabled = true
+  }
+
+  tags = {
+    Name = "ttrpg-terraform-bucket"
+  }
+}
+
+resource "aws_s3_bucket_object" "letsencrypt" {
+    bucket = aws_s3_bucket.ttrpg_bucket.id
+    acl    = "private"
+    key    = "letsencrypt/"
+    source = "/dev/null"
+}
+
+resource "aws_s3_bucket_object" "mongo_data" {
+    bucket = aws_s3_bucket.ttrpg_bucket.id
+    acl    = "private"
+    key    = "mongo_data/"
+    source = "/dev/null"
+}
+
+resource "aws_s3_bucket_object" "dr_data" {
+    bucket = aws_s3_bucket.ttrpg_bucket.id
+    acl    = "private"
+    key    = "dr_data/"
+    source = "/dev/null"
 }
 
 resource "aws_instance" "ttrpgserver" {
@@ -50,7 +83,7 @@ resource "aws_instance" "ttrpgserver" {
     inline = [
       "chmod +x /home/admin/linux_install.sh",
       "chmod 600 /home/admin/.ssh/${var.private_key_name}",
-      "/home/admin/linux_install.sh ${var.private_key_name} ${var.domain_service}",
+      "/home/admin/linux_install.sh ${var.private_key_name} ${var.domain_service} ${var.aws_region} ${var.aws_access_key_id} ${var.aws_secret_access_key}",
     ]
   }
 
