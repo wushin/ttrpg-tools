@@ -21,6 +21,26 @@ variable "public_key_name" {
 variable "ssh_key_algorithm" {
   default     = "RSA"
 }
+variable "domain_name" {
+  description = "Domain Name"
+  type        = string
+}
+variable "dr_hostname" {
+  description = "Dungeon Revealer Host Name"
+  type        = string
+}
+variable "ii_hostname" {
+  description = "Improved Initiative Host Name"
+  type        = string
+}
+variable "pa_hostname" {
+  description = "Paragon Host Name"
+  type        = string
+}
+variable "cert_arn" {
+  description = "Certificate ARN from ACM"
+  type        = string
+}
 variable "domain_service" {
   description = "Which DYNDNS client or update method to use"
   type        = string
