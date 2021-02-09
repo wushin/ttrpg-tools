@@ -4,6 +4,11 @@ server {
     ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
     server_name  ${DOMAIN};
     include /etc/nginx/${HTACCESS}.player.htaccess.conf;
+
+    location /nginx-health {
+        return 200 "healthy\n";
+    }
+
     location / {
         root /var/www/;
         try_files /$uri /$uri/ =404;
