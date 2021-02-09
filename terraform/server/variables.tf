@@ -18,31 +18,8 @@ variable "public_key_name" {
   description = "SSH Public Key filename you want to use"
   type        = string
 }
-variable "ssh_key_algorithm" {
-  default     = "RSA"
-}
-variable "domain_name" {
-  description = "Domain Name"
-  type        = string
-}
-variable "dr_hostname" {
-  description = "Dungeon Revealer Host Name"
-  type        = string
-}
-variable "ii_hostname" {
-  description = "Improved Initiative Host Name"
-  type        = string
-}
-variable "pa_hostname" {
-  description = "Paragon Host Name"
-  type        = string
-}
-variable "cert_arn" {
-  description = "Certificate ARN from ACM"
-  type        = string
-}
-variable "domain_service" {
-  description = "Which DYNDNS client or update method to use"
+variable "git_user" {
+  description = "Github account"
   type        = string
 }
 variable "aws_access_key_id" {

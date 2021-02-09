@@ -1,5 +1,5 @@
 provider "aws" {
-  region = var.aws_region
+  region  = var.aws_region
   profile = "ttrpg"
 }
 
@@ -18,7 +18,7 @@ resource "aws_instance" "ttrpgserver" {
   instance_type          = var.instance_type
   key_name               = var.private_key_name
   vpc_security_group_ids = [aws_security_group.instance.id]
-  subnet_id              = aws_subnet.default.id
+  subnet_id              = aws_subnet.default_one.id
 
   root_block_device {
     volume_size           = 30
@@ -47,15 +47,18 @@ resource "aws_instance" "ttrpgserver" {
   }
 
   provisioner "file" {
-    source      = "../../update_dns.sh"
-    destination = "/home/admin/update_dns.sh"
+    source      = "../../aws_install.sh"
+    destination = "/home/admin/aws_install.sh"
   }
 
   provisioner "remote-exec" {
     inline = [
       "chmod +x /home/admin/linux_install.sh",
+      "chmod +x /home/admin/aws_install.sh",
       "chmod 600 /home/admin/.ssh/${var.private_key_name}",
-      "/home/admin/linux_install.sh ${var.private_key_name} ${var.domain_service} ${var.aws_region} ${var.aws_access_key_id} ${var.aws_secret_access_key}",
+      "/home/admin/linux_install.sh",
+      "/home/admin/aws_install.sh ${var.private_key_name} ${var.aws_region} ${var.aws_access_key_id} ${var.aws_secret_access_key} ${var.git_user}",
+      "cd /home/admin/ttrpg-tools/ && make build",
     ]
   }
 
@@ -78,7 +81,7 @@ resource "aws_route" "internet_access" {
   gateway_id             = aws_internet_gateway.default.id
 }
 
-resource "aws_subnet" "default" {
+resource "aws_subnet" "default_one" {
   vpc_id                  = aws_vpc.default.id
   cidr_block              = "10.0.1.0/24"
   map_public_ip_on_launch = true
@@ -90,6 +93,13 @@ resource "aws_subnet" "default_two" {
   cidr_block              = "10.0.2.0/24"
   map_public_ip_on_launch = true
   availability_zone       = format("%sb", var.aws_region)
+}
+
+resource "aws_subnet" "default_three" {
+  vpc_id                  = aws_vpc.default.id
+  cidr_block              = "10.0.3.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = format("%sc", var.aws_region)
 }
 
 resource "aws_security_group" "alb" {
@@ -123,7 +133,7 @@ resource "aws_lb" "web" {
   name               = "ttrpgtools-lb"
   internal           = false
   load_balancer_type = "application"
-  subnets            = [aws_subnet.default.id,aws_subnet.default_two.id]
+  subnets            = [aws_subnet.default_one.id,aws_subnet.default_two.id,aws_subnet.default_three.id]
   security_groups    = [aws_security_group.alb.id]
 }
 
@@ -180,71 +190,5 @@ resource "aws_security_group" "instance" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-resource "aws_cloudfront_distribution" "ttrpg_distribution" {
-  origin {
-    domain_name = aws_lb.web.dns_name
-    origin_id   = aws_lb.web.id
-
-    custom_origin_config {
-      origin_read_timeout      = 30
-      origin_keepalive_timeout = 30
-      http_port                = 80
-      https_port               = 443
-      origin_protocol_policy   = "http-only"
-      origin_ssl_protocols     = ["TLSv1.2"]
-    }
-  }
-
-  enabled             = true
-  is_ipv6_enabled     = true
-  default_root_object = ""
-
-  logging_config {
-    include_cookies = false
-    bucket          = "ttrpg-terraform-bucket.s3.amazonaws.com"
-    prefix          = "logs_"
-  }
-
-  aliases = ["${var.dr_hostname}.${var.domain_name}","${var.ii_hostname}.${var.domain_name}","${var.pa_hostname}.${var.domain_name}"]
-
-  default_cache_behavior {
-    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = aws_lb.web.id
-
-    forwarded_values {
-      query_string = true
-
-      cookies {
-        forward = "all"
-      }
-      headers = [
-        "*",
-      ]
-
-    }
-
-    viewer_protocol_policy = "redirect-to-https"
-  }
-
-  restrictions {
-    geo_restriction {
-      restriction_type = "whitelist"
-      locations        = ["US", "CA", "GB", "DE"]
-    }
-  }
-
-  tags = {
-    Name = "ttrpgtools-cloudfront"
-  }
-
-  viewer_certificate {
-    acm_certificate_arn            = var.cert_arn
-    cloudfront_default_certificate = false
-    ssl_support_method             = "sni-only"
-    minimum_protocol_version       = "TLSv1.2_2019"
   }
 }
