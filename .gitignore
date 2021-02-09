@@ -4,3 +4,9 @@ nginx/certbot.sh
 nginx/files/conf.d/default.conf
 *.conf
 *.bak
+.terraform.lock.hcl
+*/*/.terraform/*
+terraform.tfstate*
+.terraform.tfstate.*
+aws-build.tfvars
+*user_cred*
