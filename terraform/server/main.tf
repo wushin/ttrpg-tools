@@ -142,7 +142,9 @@ resource "aws_lb_target_group" "ttrpgtools" {
   name          = "ttrpgtools-lb-tg"
   port          = 80
   protocol      = "HTTP"
-  health_check  = "/nginx-health"
+  health_check {
+    path        = "/nginx-health"
+  }
   vpc_id        = aws_vpc.default.id
 }
 
@@ -219,12 +221,13 @@ resource "aws_cloudfront_distribution" "ttrpg_distribution" {
       cookies {
         forward = "all"
       }
+      headers = [
+        "*",
+      ]
+
     }
 
-    viewer_protocol_policy = "allow-all"
-    min_ttl                = 0
-    default_ttl            = 3600
-    max_ttl                = 86400
+    viewer_protocol_policy = "redirect-to-https"
   }
 
   restrictions {
