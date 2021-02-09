@@ -42,20 +42,19 @@ resource "aws_instance" "ttrpgserver" {
   }
 
   provisioner "file" {
-    source      = "../../linux_install.sh"
-    destination = "/home/admin/linux_install.sh"
-  }
-
-  provisioner "file" {
     source      = "../../aws_install.sh"
     destination = "/home/admin/aws_install.sh"
   }
 
+  provisioner "file" {
+    source      = "../../linux_install.sh"
+    destination = "/home/admin/linux_install.sh"
+  }
+
   provisioner "remote-exec" {
     inline = [
-      "chmod +x /home/admin/linux_install.sh",
-      "chmod +x /home/admin/aws_install.sh",
       "chmod 600 /home/admin/.ssh/${var.private_key_name}",
+      "chmod +x /home/admin/linux_install.sh /home/admin/aws_install.sh",
       "/home/admin/linux_install.sh",
       "/home/admin/aws_install.sh ${var.private_key_name} ${var.aws_region} ${var.aws_access_key_id} ${var.aws_secret_access_key} ${var.git_user}",
       "cd /home/admin/ttrpg-tools/ && make build",

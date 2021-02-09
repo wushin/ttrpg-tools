@@ -4,3 +4,5 @@
 4. create server
 5. create route53
 6. create cloudfront
+
+Cloudfront destroy needs you to disable the instance first
