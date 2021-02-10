@@ -1,0 +1,6 @@
+domain_name     = "ttrpg-tools.org"
+use_dns_method  = false
+aws_dns_zone_id = "Z3455252ASDW8DSF988Q"
+dr_hostname     = "maps"
+ii_hostname     = "impinit"
+pa_hostname     = "paragon"

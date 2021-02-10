@@ -1,7 +1,10 @@
-domain_name           = "ttrpgtools.org"
+aws_region            = "us-east-2"
+domain_name           = "ttrpg-tools.org"
 aws_dns_zone_id       = "Z3455252ASDW8DSF988Q"
-aws_lb_dns_name       = ""
-aws_lb_id             = "'
+enable_aws_dns        = true
+aws_lb_dns_name       = "ttrpgtools-lb-234124115.us-east-2.elb.amazonaws.com"
+aws_lb_id             = "arn:aws:elasticloadbalancing:us-east-2:342343256233:loadbalancer/app/ttrpgtools-lb/3a7f3e2467456749"
+acm_certificate_arn   = "arn:aws:acm:us-east-1:837492374982:certificate/43adf09d-fd90-fdfd-9984-dfdf57bkj343"
 dr_hostname           = "maps"
 ii_hostname           = "impinit"
 pa_hostname           = "paragon"

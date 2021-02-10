@@ -1,5 +1,5 @@
 provider "aws" {
-  region  = "us-east-1"
+  region  = var.aws_region
   profile = "ttrpg"
 }
 
@@ -62,45 +62,15 @@ resource "aws_cloudfront_distribution" "ttrpg_distribution" {
   }
 
   viewer_certificate {
-    acm_certificate_arn            = aws_acm_certificate.cert.arn
+    acm_certificate_arn            = var.acm_certificate_arn
     cloudfront_default_certificate = false
     ssl_support_method             = "sni-only"
     minimum_protocol_version       = "TLSv1.2_2019"
   }
 }
 
-resource "aws_acm_certificate" "cert" {
-  domain_name               = var.domain_name
-  validation_method         = "DNS"
-  subject_alternative_names = [format("%s.%s", var.dr_hostname,var.domain_name),format("%s.%s", var.ii_hostname,var.domain_name),format("%s.%s", var.pa_hostname,var.domain_name)]
-  tags = {
-    Name = "ttrpg-tools-ssl"
-  }
-
-}
-
-resource "aws_route53_record" "cert_validation" {
-  for_each = {
-    for dvo in aws_acm_certificate.cert.domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-    }
-  }
-  zone_id         = var.aws_dns_zone_id
-  allow_overwrite = true
-  name            = each.value.name
-  records         = [each.value.record]
-  ttl             = 60
-  type            = each.value.type
-}
-
-resource "aws_acm_certificate_validation" "cert" {
-  certificate_arn         = aws_acm_certificate.cert.arn
-  validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
-}
-
 resource "aws_route53_record" "www" {
+  count = var.enable_aws_dns ? 1 : 0
   zone_id = var.aws_dns_zone_id
   name    = "www"
   type    = "CNAME"
@@ -110,6 +80,7 @@ resource "aws_route53_record" "www" {
 }
 
 resource "aws_route53_record" "dungeon-revealer" {
+  count = var.enable_aws_dns ? 1 : 0
   zone_id = var.aws_dns_zone_id
   name    = var.dr_hostname
   type    = "CNAME"
@@ -119,6 +90,7 @@ resource "aws_route53_record" "dungeon-revealer" {
 }
 
 resource "aws_route53_record" "improved-initiative" {
+  count = var.enable_aws_dns ? 1 : 0
   zone_id = var.aws_dns_zone_id
   name    = var.ii_hostname
   type    = "CNAME"
@@ -128,6 +100,7 @@ resource "aws_route53_record" "improved-initiative" {
 }
 
 resource "aws_route53_record" "paragon" {
+  count = var.enable_aws_dns ? 1 : 0
   zone_id = var.aws_dns_zone_id
   name    = var.pa_hostname
   type    = "CNAME"
