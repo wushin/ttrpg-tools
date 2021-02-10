@@ -1,11 +1,5 @@
-plan:
-	terraform plan
-
-apply:
-	terraform apply
-
 install:
-	bash ./set-up.sh build
+	bash ./linux_install.sh
 
 build:
 	bash ./set-up.sh build
