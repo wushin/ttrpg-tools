@@ -9,4 +9,5 @@ nginx/files/conf.d/default.conf
 terraform.tfstate*
 .terraform.tfstate.*
 aws-build.tfvars
-*user_cred*
+z.gpg.pub
+*.csv

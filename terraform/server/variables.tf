@@ -22,11 +22,11 @@ variable "git_user" {
   description = "Github account"
   type        = string
 }
-variable "aws_access_key_id" {
-  description = "AWS Access Key Id"
+variable "aws_s3_access_key_id" {
+  description = "AWS s3 Access Key Id"
   type        = string
 }
-variable "aws_secret_access_key" {
-  description = "AWS Secret Access Key"
+variable "aws_s3_secret_access_key" {
+  description = "AWS s3 Secret Access Key"
   type        = string
 }
