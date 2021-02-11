@@ -1,3 +1,13 @@
+terraform {
+  backend "s3" {
+    encrypt = true
+    bucket = "ttrpg-remote-state-storage-s3"
+    dynamodb_table = "ttrpg-state-lock-dynamo"
+    region = "us-east-2"
+    key = ".terraform/terraform.tfstate"
+    profile = "ttrpg"
+  }
+}
 provider "aws" {
   alias   = "ttrpg"
   region  = var.aws_region

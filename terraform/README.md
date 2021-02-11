@@ -61,32 +61,34 @@ aws_secret_access_key = <Access Key Secret>
     * `cd ./terraform/`
     * `terraform init`
     * `cp aws-build.tfvars.sample aws-build.tfvars`
-      * aws-build.tfvars defined
-```
-enable_acm_cloudfront      = true Whether or not to use cloudfront
-enable_aws_dns             = true Whether or not cloudfront should add DNS record to route53
-use_dns_method             = true Whether to use DNS or EMAIL for certificate validation
-restore_from_local         = true Whether or not to use this local repo to seed s3
-aws_region                 = "us-east-2"
-instance_type              = [Instance Type](https://aws.amazon.com/ec2/instance-types/)
-sshpath                    = Absolute Path to where your SSH keys are stored
-private_key_name           = Private SSH Key Name
-public_key_name            = Public SSH Key Name
-git_user                   = Your github repo user
-aws_s3_access_key_id       = ttrpg-s3 Access Key ID
-aws_s3_secret_access_key   = ttrpg-s3 Access Secret Key
-domain_name                = "Domain Name you have registered"
-aws_dns_zone_id            = "Zone Id from route53 hosted zones record that matches the domain"
-dr_hostname                = "maps"    Sub-domain of Dungeon Revealer Host
-ii_hostname                = "impinit" Sub-domain of Improved Initiative Host
-pa_hostname                = "paragon" Sub-domain of Paragon Host
-``` 
+    * `terraform apply -var-file="aws-build.tfvars" -auto-approve`
 
-  * `terraform apply -var-file="aws-build.tfvars" -auto-approve`
+### aws-build.tfvars defined
+Name | Value | Explanation
+-----|-------|-------------
+enable_acm_cloudfront | true/false | Whether or not to use cloudfront
+enable_aws_dns | true/false | Whether or not cloudfront should add DNS record to route53
+use_dns_method | true/false | Whether to use DNS or EMAIL for certificate validation
+restore_from_local | true/false | Whether or not to use this local repo to seed s3
+aws_region | AWS Region | Region services will be located
+instance_type | Instance Type | [Instance Type](https://aws.amazon.com/ec2/instance-types/)
+sshpath | /home/user/.ssh/ | Absolute Path to where your SSH keys are stored
+private_key_name | some_ssh_private_keyname | Private SSH Key Name
+public_key_name | some_ssh_public_keyname | Public SSH Key Name
+git_user | git repo user | Your github repo user
+aws_s3_access_key_id | ttrpg_s3_access_key_id | ttrpg-s3 Access Key ID
+aws_s3_secret_access_key | ttrpg_s3_access_key_secret | ttrpg-s3 Access Secret Key
+domain_name | domain.org | Domain Name you have registered
+aws_dns_zone_id | ZAJHSK7867860 | Zone Id from route53 hosted zones record that matches the domain
+dr_hostname | maps | Sub-domain of Dungeon Revealer Host
+ii_hostname | impinit | Sub-domain of Improved Initiative Host
+pa_hostname | paragon | Sub-domain of Paragon Host
 
-## Done! 
 
-## How to run the individual builds
+## All Done! 
+
+
+## How the individual modules work and run alone
 
   * Backup (s3)
     * Create s3 Bucket
@@ -110,18 +112,6 @@ pa_hostname                = "paragon" Sub-domain of Paragon Host
       * `cd ./terraform/server/`
       * `terraform init`
       * `cp aws-build.tfvars.sample aws-build.tfvars`
-        * aws-build.tfvars defined
-```
-aws_region               = "us-east-2"
-instance_type            = [Instance Type](https://aws.amazon.com/ec2/instance-types/)
-sshpath                  = Absolute Path to where your SSH keys are stored
-private_key_name         = Private SSH Key Name
-public_key_name          = Public SSH Key Name
-git_user                 = Your github repo user
-aws_s3_access_key_id     = ttrpg-s3 Access Key ID
-aws_s3_secret_access_key = ttrpg-s3 Access Secret Key
-```
-
       * `terraform apply -var-file="aws-build.tfvars" -auto-approve`
       * Server should deploy and build the Docker containers as well
     * Outputs
@@ -135,45 +125,45 @@ aws_s3_secret_access_key = ttrpg-s3 Access Secret Key
         * See [Main Readme for details](https://github.com/wushin/ttrpg-tools/blob/main/README.md)
     * You can use the let's encrypt SSL method at this point. If you proceed, disable ssl in the .env file and rebuild.
 
+### aws-build.tfvars defined
+Name | Value | Explanation
+-----|-------|-------------
+aws_region | AWS Region | Region services will be located
+instance_type | Instance Type | [Instance Type](https://aws.amazon.com/ec2/instance-types/)
+sshpath | /home/user/.ssh/ | Absolute Path to where your SSH keys are stored
+private_key_name | some_ssh_private_keyname | Private SSH Key Name
+public_key_name | some_ssh_public_keyname | Public SSH Key Name
+git_user | git repo user | Your github repo user
+aws_s3_access_key_id | ttrpg_s3_access_key_id | ttrpg-s3 Access Key ID
+aws_s3_secret_access_key | ttrpg_s3_access_key_secret | ttrpg-s3 Access Secret Key
+      
+
   * Certificate (ACM) (optional)
     * DNS (route53)
       * `cd ./terraform/certificates/`
       * `terraform init`
       * `cp aws-build.tfvars.sample aws-build.tfvars`
-        * aws-build.tfvars defined
-```
-domain_name     = "Domain Name you have registered"
-use_dns_method  = true
-aws_dns_zone_id = "Zone Id from route53 hosted zones record that matches the domain"
-dr_hostname     = "maps"    Sub-domain of Dungeon Revealer Host
-ii_hostname     = "impinit" Sub-domain of Improved Initiative Host
-pa_hostname     = "paragon" Sub-domain of Paragon Host
-```
-
       * `terraform apply -var-file="aws-build.tfvars" -auto-approve`
     * Email (Suggested for non-route53 domains)
       * Same as above except set use_dns_method false
         * `use_dns_method  = false`
+
+### aws-build.tfvars defined
+Name | Value | Explanation
+-----|-------|-------------
+use_dns_method | true/false | Whether to use DNS or EMAIL for certificate validation
+domain_name | domain.org | Domain Name you have registered
+aws_dns_zone_id | ZAJHSK7867860 | Zone Id from route53 hosted zones record that matches the domain
+dr_hostname | maps | Sub-domain of Dungeon Revealer Host
+ii_hostname | impinit | Sub-domain of Improved Initiative Host
+pa_hostname | paragon | Sub-domain of Paragon Host
+
 
   * Cloudfront (Cloudfront) (optional)
     * Auto DNS (route53)
       * `cd ./terraform/cloudfront/`
       * `terraform init`
       * `cp aws-build.tfvars.sample aws-build.tfvars`
-        * aws-build.tfvars defined
-```
-aws_region            = "us-east-2"
-domain_name           = "Domain Name you have registered"
-aws_dns_zone_id       = "Zone Id from route53 hosted zones record that matches the domain"
-enable_aws_dns        = true
-aws_lb_dns_name       = "aws_lb_dns_name from outputs of server terraform"
-aws_lb_id             = "aws_lb_id from outputs of server terraform"
-acm_certificate_arn   = "acm_certificate_arn from outputs of certificate terraform"
-dr_hostname           = "maps"    Sub-domain of Dungeon Revealer Host
-ii_hostname           = "impinit" Sub-domain of Improved Initiative Host
-pa_hostname           = "paragon" Sub-domain of Paragon Host
-```
-
       * `terraform apply -var-file="aws-build.tfvars" -auto-approve`
       * cloudfront_dns result will automatically be added to your DNS for each host
 
@@ -181,4 +171,19 @@ pa_hostname           = "paragon" Sub-domain of Paragon Host
       * Same as above except set enable_aws_dns false
         `enable_aws_dns        = false`
       * cloudfront_dns will return as a output. Use this for your hosts as a CNAME record.
+
+
+### aws-build.tfvars defined
+Name | Value | Explanation
+-----|-------|-------------
+enable_aws_dns | true/false | Whether or not cloudfront should add DNS record to route53
+aws_region | AWS Region | Region services will be located
+domain_name | domain.org | Domain Name you have registered
+aws_dns_zone_id | ZAJHSK7867860 | Zone Id from route53 hosted zones record that matches the domain
+dr_hostname | maps | Sub-domain of Dungeon Revealer Host
+ii_hostname | impinit | Sub-domain of Improved Initiative Host
+pa_hostname | paragon | Sub-domain of Paragon Host
+aws_lb_dns_name | aws_lb_dns_name | aws_lb_dns_name from outputs of server terraform
+aws_lb_id | aws_lb_id | aws_lb_id from outputs of server terraform
+acm_certificate_arn | acm_certificate_arn | acm_certificate_arn from outputs of certificate terraform
 
