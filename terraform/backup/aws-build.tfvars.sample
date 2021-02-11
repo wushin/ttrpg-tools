@@ -1,1 +1,3 @@
 aws_region            = "us-east-2"
+module_depth          = "../../"
+restore_from_local    = true
