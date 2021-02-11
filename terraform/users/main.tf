@@ -88,3 +88,24 @@ resource "aws_iam_group_membership" "ttrpg-s3" {
 resource "aws_iam_access_key" "ttrpg-s3" {
   user = aws_iam_user.ttrpg-s3.name
 }
+
+resource "aws_s3_bucket" "ttrpg-state-storage-s3" {
+    bucket = "ttrpg-remote-state-storage-s3"
+    versioning {
+      enabled = true
+    }
+    lifecycle {
+      prevent_destroy = true
+    }
+}
+
+resource "aws_dynamodb_table" "dynamodb-ttrpg-state-lock" {
+  name = "ttrpg-state-lock-dynamo"
+  hash_key = "LockID"
+  read_capacity = 20
+  write_capacity = 20
+  attribute {
+    name = "LockID"
+    type = "S"
+  }
+}
