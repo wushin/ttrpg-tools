@@ -1,0 +1,16 @@
+enable_acm_cloudfront      = true Whether or not to use cloudfront
+enable_aws_dns             = true Whether or not cloudfront should add DNS record to route53
+use_dns_method             = true Whether to use DNS or EMAIL for certificate validation
+aws_region                 = "us-east-2"
+instance_type              = [Instance Type](https://aws.amazon.com/ec2/instance-types/)
+sshpath                    = Absolute Path to where your SSH keys are stored
+private_key_name           = Private SSH Key Name
+public_key_name            = Public SSH Key Name
+git_user                   = Your github repo user
+aws_s3_access_key_id       = ttrpg-s3 Access Key ID
+aws_s3_secret_access_key   = ttrpg-s3 Access Secret Key
+domain_name                = "Domain Name you have registered"
+aws_dns_zone_id            = "Zone Id from route53 hosted zones record that matches the domain"
+dr_hostname                = "maps"    Sub-domain of Dungeon Revealer Host
+ii_hostname                = "impinit" Sub-domain of Improved Initiative Host
+pa_hostname                = "paragon" Sub-domain of Paragon Host

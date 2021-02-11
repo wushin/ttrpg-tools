@@ -1,6 +1,9 @@
-provider "aws" {
-  region  = var.aws_region
-  profile = "ttrpg"
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+    }
+  }
 }
 
 locals {
@@ -37,17 +40,17 @@ resource "aws_instance" "ttrpgserver" {
   }
 
   provisioner "file" {
-    source      = "../../.env"
+    source      = ".env"
     destination = "/home/admin/.env"
   }
 
   provisioner "file" {
-    source      = "../../aws_install.sh"
+    source      = "aws_install.sh"
     destination = "/home/admin/aws_install.sh"
   }
 
   provisioner "file" {
-    source      = "../../linux_install.sh"
+    source      = "linux_install.sh"
     destination = "/home/admin/linux_install.sh"
   }
 

@@ -1,6 +1,9 @@
-provider "aws" {
-  region  = "us-east-1"
-  profile = "ttrpg"
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+    }
+  }
 }
 
 resource "aws_acm_certificate" "cert" {
@@ -13,13 +16,13 @@ resource "aws_acm_certificate" "cert" {
 }
 
 resource "aws_acm_certificate_validation" "cert" {
-  count = var.use_dns_method ? 1 : 0
+  count                   = var.use_dns_method ? 1 : 0
   certificate_arn         = aws_acm_certificate.cert.arn
   validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
 }
 
 resource "aws_route53_record" "cert_validation" {
-  count = var.use_dns_method ? 4 : 0
+  count           = var.use_dns_method ? 4 : 0
   name            = aws_acm_certificate.cert.domain_validation_options.*.resource_record_name[count.index]
   records         = [aws_acm_certificate.cert.domain_validation_options.*.resource_record_value[count.index]]
   type            = aws_acm_certificate.cert.domain_validation_options.*.resource_record_type[count.index]
@@ -29,6 +32,6 @@ resource "aws_route53_record" "cert_validation" {
 }
 
 resource "aws_acm_certificate_validation" "ttrpg-tools-ssl" {
-  count = var.use_dns_method ? 0 : 1
+  count           = var.use_dns_method ? 0 : 1
   certificate_arn = aws_acm_certificate.cert.arn
 }
