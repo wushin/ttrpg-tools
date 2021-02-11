@@ -35,7 +35,6 @@ services:
     restart: always
     command: /bin/bash -c "cp -a ./public/* ./public-tmp/ && node server/server.js"
     environment:
-      - NODE_ENV
       - PORT=4000
       - DB_CONNECTION_STRING=mongodb://mongo:27017/
     volumes:
@@ -62,6 +61,7 @@ services:
 
   mongo:
     image: mongo:latest
+    user: 1000:1000
     container_name: mongo
     restart: always
     environment:

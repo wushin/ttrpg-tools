@@ -1,6 +1,9 @@
-provider "aws" {
-  region  = var.aws_region
-  profile = "ttrpg"
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+    }
+  }
 }
 
 resource "aws_cloudfront_distribution" "ttrpg_distribution" {
