@@ -38,6 +38,10 @@ variable "use_dns_method" {
   description = "Which method DNS or EMAIL for validation"
   type        = bool
 }
+variable "restore_from_local" {
+  description = "Whether or not to restore from this local build"
+  type        = bool
+}
 variable "aws_dns_zone_id" {
   description = "Route53 zone file ID"
   type        = string

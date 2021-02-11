@@ -15,7 +15,9 @@ module "create_s3_backup" {
   providers = {
     aws = aws.ttrpg
   }
-  aws_region = var.aws_region
+  aws_region         = var.aws_region
+  module_depth       = "../"
+  restore_from_local = var.restore_from_local
 }
 
 module "create_ec2_alb_vpc" {

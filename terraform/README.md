@@ -66,6 +66,7 @@ aws_secret_access_key = <Access Key Secret>
 enable_acm_cloudfront      = true Whether or not to use cloudfront
 enable_aws_dns             = true Whether or not cloudfront should add DNS record to route53
 use_dns_method             = true Whether to use DNS or EMAIL for certificate validation
+restore_from_local         = true Whether or not to use this local repo to seed s3
 aws_region                 = "us-east-2"
 instance_type              = [Instance Type](https://aws.amazon.com/ec2/instance-types/)
 sshpath                    = Absolute Path to where your SSH keys are stored
