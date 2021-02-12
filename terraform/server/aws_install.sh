@@ -1,1 +1,0 @@
-../../aws_install.sh

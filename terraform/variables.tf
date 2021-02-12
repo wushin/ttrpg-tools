@@ -22,10 +22,6 @@ variable "git_user" {
   description = "Github account"
   type        = string
 }
-variable "domain_name" {
-  description = "Domain Name"
-  type        = string
-}
 variable "enable_acm_cloudfront" {
   description = "Whether or not to use cloudfront"
   type        = bool
@@ -44,18 +40,6 @@ variable "restore_from_local" {
 }
 variable "aws_dns_zone_id" {
   description = "Route53 zone file ID"
-  type        = string
-}
-variable "dr_hostname" {
-  description = "Dungeon Revealer Host Name"
-  type        = string
-}
-variable "ii_hostname" {
-  description = "Improved Initiative Host Name"
-  type        = string
-}
-variable "pa_hostname" {
-  description = "Paragon Host Name"
   type        = string
 }
 variable "aws_s3_access_key_id" {

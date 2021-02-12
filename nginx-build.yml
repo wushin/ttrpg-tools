@@ -1,0 +1,51 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      python: 3.7
+    commands:
+      - python --version
+  pre_build:
+    commands:
+      - export STARTTIME=`date +%s`
+      - export BUILDNAME="$GIT_BRANCH-`date +%Y-%m-%d`"
+      - export BRANCH="$GIT_BRANCH"
+      - export SOURCE_VERSION="$CODEBUILD_SOURCE_VERSION"
+      - echo "BRANCH $BRANCH"
+      - echo "SOURCE_VERSION $SOURCE_VERSION"
+      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+      - IMAGE_TAG=build-$(git rev-parse HEAD)
+  build:
+    commands:
+      - curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+      - apt-get -y update
+      - apt-get install -y nfs-common
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - echo $REPOURL:latest $REPOURL:$IMAGE_TAG
+      - docker build -t nginx --build-arg HTACCESS=$HTACCESS --build-arg DOMAIN=$DOMAIN --build-arg DOMAIN_EMAIL=$DOMAIN_EMAIL --build-arg DR_HOST=$DR_HOST --build-arg DR_HOST_CN=$DR_HOST_CN --build-arg II_HOST=$II_HOST --build-arg II_HOST_CN=$II_HOST_CN --build-arg PA_HOST=$PA_HOST --build-arg PA_HOST_CN=$PA_HOST_CN --build-arg DM_HOST=$DM_HOST --build-arg SSL=$SSL --build-arg ht_pass=$DR_USER_PASS --build-arg ht_user=$HT_USER --build-arg ht_dm_pass=$DR_DM_PASS --build-arg ht_dm_user=$HT_DM_USER ./nginx/
+      - docker tag nginx:latest $REPOURL:latest
+      - docker tag nginx:latest $REPOURL:$IMAGE_TAG
+      - docker images
+      - docker create nginx
+      - CONTAINER=$(docker ps -a | grep nginx | awk '{print $1}')
+      - docker ps -a
+      - echo $CONTAINER
+      - mkdir ./letsencrypt/
+      - mount -t nfs -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport $NGINX_EFS:/ ./letsencrypt/
+      - docker cp -a $CONTAINER:/etc/letsencrypt/ ./letsencrypt/
+      - chown 1000:1000 -R ./letsencrypt/
+      - sleep 3
+      - echo Pushing the Docker images...
+      - echo $REPOURL/nginx:latest $REPOURL:$IMAGE_TAG
+      - docker push $REPOURL:latest
+      - docker push $REPOURL:$IMAGE_TAG
+      - aws ecs update-service --force-new-deployment --service nginx --cluster ttrpg-cluster
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - pwd
+      - ls -al
+artifacts:
+  files:
+    - '**/*'

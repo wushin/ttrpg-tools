@@ -31,7 +31,7 @@ resource "aws_cloudfront_distribution" "ttrpg_distribution" {
     prefix          = "logs_"
   }
 
-  aliases = [var.domain_name,"${var.dr_hostname}.${var.domain_name}","${var.ii_hostname}.${var.domain_name}","${var.pa_hostname}.${var.domain_name}"]
+  aliases = [data.aws_ssm_parameter.domain.value,"${data.aws_ssm_parameter.dr_host.value}.${data.aws_ssm_parameter.domain.value}","${data.aws_ssm_parameter.ii_host.value}.${data.aws_ssm_parameter.domain.value}","${data.aws_ssm_parameter.pa_host.value}.${data.aws_ssm_parameter.domain.value}"]
 
   default_cache_behavior {
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
@@ -85,7 +85,7 @@ resource "aws_route53_record" "www" {
 resource "aws_route53_record" "dungeon-revealer" {
   count = var.enable_aws_dns ? 1 : 0
   zone_id = var.aws_dns_zone_id
-  name    = var.dr_hostname
+  name    = data.aws_ssm_parameter.dr_host.value
   type    = "CNAME"
   ttl     = "60"
 
@@ -95,7 +95,7 @@ resource "aws_route53_record" "dungeon-revealer" {
 resource "aws_route53_record" "improved-initiative" {
   count = var.enable_aws_dns ? 1 : 0
   zone_id = var.aws_dns_zone_id
-  name    = var.ii_hostname
+  name    = data.aws_ssm_parameter.ii_host.value
   type    = "CNAME"
   ttl     = "60"
 
@@ -105,7 +105,7 @@ resource "aws_route53_record" "improved-initiative" {
 resource "aws_route53_record" "paragon" {
   count = var.enable_aws_dns ? 1 : 0
   zone_id = var.aws_dns_zone_id
-  name    = var.pa_hostname
+  name    = data.aws_ssm_parameter.pa_host.value
   type    = "CNAME"
   ttl     = "60"
 

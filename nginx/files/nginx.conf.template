@@ -37,17 +37,7 @@ http {
 
     gzip  on;
 
-    upstream dungeon-revealer-host {
-        server dungeon-revealer:3000;
-    }
+    resolver ${RESOLVER} valid=10s;
 
-    upstream improved-initiative-host {
-        server improved-initiative:4000;
-    }
-
-    upstream paragon-host {
-        server paragon:3000;
-    }
-
-    include /etc/nginx/conf.d/*.conf;
+    include /etc/nginx/conf.d/*.${SSL}.conf;
 }

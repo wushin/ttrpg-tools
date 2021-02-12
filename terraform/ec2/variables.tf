@@ -2,6 +2,10 @@ variable "aws_region" {
   description = "Region services should spawn in"
   type        = string
 }
+variable "module_depth" {
+  description = "Where are we in relation to the root of repo"
+  type        = string
+}
 variable "instance_type" {
   description = "What size of ec2 server to run on"
   type        = string
@@ -28,5 +32,17 @@ variable "aws_s3_access_key_id" {
 }
 variable "aws_s3_secret_access_key" {
   description = "AWS s3 Secret Access Key"
+  type        = string
+}
+variable "aws_sg_ec2_id" {
+  description = "AWS Security Group for ec2 instance"
+  type        = string
+}
+variable "aws_subnet_one_id" {
+  description = "ec2 subnet id"
+  type        = string
+}
+variable "aws_lb_target_id" {
+  description = "ec2 loadbalancer target group"
   type        = string
 }
