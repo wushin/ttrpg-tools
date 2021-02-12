@@ -29,7 +29,7 @@ resource "aws_s3_bucket_object" "letsencrypt" {
 resource "aws_s3_bucket_object" "letsencrypt_objects" {
   for_each = var.restore_from_local ? fileset("${var.module_depth}nginx/ssl/", "**") : []
   bucket = aws_s3_bucket.ttrpg_bucket.id
-  key = each.value
+  key = "letsencrypt/${each.value}"
   source = "${var.module_depth}nginx/ssl/${each.value}"
 }
 
@@ -43,7 +43,7 @@ resource "aws_s3_bucket_object" "mongo_data" {
 resource "aws_s3_bucket_object" "mongo_data_objects" {
   for_each = var.restore_from_local ? fileset("${var.module_depth}mongo/data/", "**") : []
   bucket = aws_s3_bucket.ttrpg_bucket.id
-  key = each.value
+  key = "mongo_data/${each.value}"
   source = "${var.module_depth}mongo/data/${each.value}"
 }
 
@@ -57,7 +57,7 @@ resource "aws_s3_bucket_object" "dr_data" {
 resource "aws_s3_bucket_object" "dr_data_objects" {
   for_each = var.restore_from_local ? fileset("${var.module_depth}dungeon-revealer/data/", "**") : []
   bucket = aws_s3_bucket.ttrpg_bucket.id
-  key = each.value
+  key = "dr_data/${each.value}"
   source = "${var.module_depth}dungeon-revealer/data/${each.value}"
 }
 
