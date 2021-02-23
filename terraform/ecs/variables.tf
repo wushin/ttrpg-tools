@@ -78,6 +78,10 @@ variable "pa_repo_url" {
   description = "ECR pa repo"
   type        = string
 }
+variable "mongo_repo_url" {
+  description = "ECR mongo repo"
+  type        = string
+}
 variable "aws_dns_zone_id" {
   description = "DNS zone id"
   type        = string

@@ -89,3 +89,24 @@ resource "aws_ecr_repository" "ttrpg-pa" {
     command = "sudo docker push ${aws_ecr_repository.ttrpg-pa.repository_url}:latest"
   }
 }
+
+resource "aws_ecr_repository" "ttrpg-mongo" {
+  name                 = "mongo"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+  provisioner "local-exec" {
+    when = create
+    command = "sudo docker tag mongo ${aws_ecr_repository.ttrpg-mongo.repository_url}:latest"
+  }
+  provisioner "local-exec" {
+    when = create
+    command = "aws --profile ttrpg ecr get-login-password --region ${var.aws_region} | sudo docker login --username AWS --password-stdin ${aws_ecr_repository.ttrpg-pa.repository_url}"
+  }
+  provisioner "local-exec" {
+    when = create
+    command = "sudo docker push ${aws_ecr_repository.ttrpg-mongo.repository_url}:latest"
+  }
+}

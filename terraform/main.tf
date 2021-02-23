@@ -81,6 +81,7 @@ module "create_ecs" {
   dr_repo_url              = module.create_ecr.dr_repo_url
   ii_repo_url              = module.create_ecr.ii_repo_url
   pa_repo_url              = module.create_ecr.pa_repo_url
+  mongo_repo_url           = module.create_ecr.mongo_repo_url
   aws_dns_zone_id          = var.aws_dns_zone_id
   aws_lb_dns_name          = module.create_network.aws_lb_dns_name
   s3_bucket_dr_task        = module.create_s3_backup.s3_bucket_dr_task

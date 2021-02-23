@@ -206,8 +206,8 @@ resource "aws_autoscaling_group" "failure_analysis_ecs_asg" {
   vpc_zone_identifier       = [var.aws_subnet_one_id]
   launch_configuration      = aws_launch_configuration.ecs_launch_config.name
 
-  desired_capacity          = 4
-  min_size                  = 4
+  desired_capacity          = 5
+  min_size                  = 5
   max_size                  = 8
   health_check_grace_period = 300
   health_check_type         = "EC2"
@@ -267,6 +267,21 @@ resource "aws_service_discovery_service" "improved-initiative" {
 
 resource "aws_service_discovery_service" "paragon" {
   name = aws_ecs_task_definition.ttrpg-pa-ecs-task-definition.family
+  dns_config {
+    namespace_id = aws_service_discovery_private_dns_namespace.ttrpg.id
+    dns_records {
+      ttl  = 10
+      type = "A"
+    }
+    routing_policy = "MULTIVALUE"
+  }
+  health_check_custom_config {
+    failure_threshold = 1
+  }
+}
+
+resource "aws_service_discovery_service" "mongo" {
+  name = aws_ecs_task_definition.ttrpg-mongo-ecs-task-definition.family
   dns_config {
     namespace_id = aws_service_discovery_private_dns_namespace.ttrpg.id
     dns_records {
@@ -623,7 +638,7 @@ resource "aws_ecs_task_definition" "ttrpg-ii-ecs-task-definition" {
       },
       {
         "name": "DB_CONNECTION_STRING",
-        "value": "mongodb://${aws_docdb_cluster.ttrpg-mongo.endpoint}:27017/?ssl=true&ssl_ca_certs=rds-combined-ca-bundle.pem&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
+        "value": "mongodb://mongo.ttrpg.terraform.internal:27017/"
       }
     ]
   }
@@ -705,28 +720,96 @@ resource "aws_ecs_task_definition" "ttrpg-pa-ecs-task-definition" {
 EOF
 }
 
-resource "aws_docdb_subnet_group" "ttrpg" {
-  name       = "ttrpg-group"
-  subnet_ids = [var.aws_subnet_one_id,var.aws_subnet_two_id]
+resource "aws_cloudwatch_log_group" "mongo" {
+  name = "mongo"
 }
 
-resource "aws_docdb_cluster" "ttrpg-mongo" {
-  cluster_identifier              = "ttrpg-mongo"
-  engine                          = "docdb"
-  master_username                 = data.aws_ssm_parameter.mongo_user.value
-  master_password                 = data.aws_ssm_parameter.mongo_pass.value
-  vpc_security_group_ids          = [var.aws_sg_ec2_id]
-  port                            = "27017"
-  db_subnet_group_name            = aws_docdb_subnet_group.ttrpg.name
-  skip_final_snapshot             = true
-  backup_retention_period         = 1
-  apply_immediately               = true
-  enabled_cloudwatch_logs_exports = ["audit","profiler"]
+resource "aws_ecs_service" "ttrpg-mongo-ecs-service" {
+  name            = "mongo"
+  cluster         = aws_ecs_cluster.ttrpg-cluster.id
+  task_definition = aws_ecs_task_definition.ttrpg-mongo-ecs-task-definition.arn
+  launch_type     = "EC2"
+
+  desired_count = 1
+
+  network_configuration {
+    subnets          = [var.aws_subnet_one_id]
+    security_groups  = [var.aws_sg_ec2_id]
+  }
+
+  service_registries {
+    registry_arn = aws_service_discovery_service.mongo.arn
+    container_name = "mongo"
+  }
 }
 
-resource "aws_docdb_cluster_instance" "ttrpg-mongo-instances" {
-  count              = 1
-  identifier         = "docdb-cluster-ttrpg-${count.index}"
-  cluster_identifier = aws_docdb_cluster.ttrpg-mongo.id
- instance_class     = "db.t3.medium"
+resource "aws_ecs_task_definition" "ttrpg-mongo-ecs-task-definition" {
+  family                   = "mongo"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["EC2"]
+  memory                   = "900"
+  cpu                      = "900"
+
+  container_definitions    = <<EOF
+[
+  {
+    "name": "mongo",
+    "image": "${var.mongo_repo_url}:latest",
+    "memory": 512,
+    "cpu": 512,
+    "essential": true,
+    "portMappings": [
+      {
+        "containerPort": 27017,
+        "hostPort": 27017,
+        "protocol": "tcp"
+      }
+    ],
+    "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+            "awslogs-group": "mongo",
+            "awslogs-region": "us-east-2",
+            "awslogs-stream-prefix": "mongo"
+        }
+    },
+    "environment": [
+      {
+        "name": "MONGO_INITDB_ROOT_USERNAME",
+        "value": "${data.aws_ssm_parameter.mongo_user.value}"
+      },
+      {
+        "name": "MONGO_INITDB_ROOT_PASSWORD",
+        "value": "${data.aws_ssm_parameter.mongo_pass.value}"
+      }
+    ]
+  }
+]
+EOF
 }
+
+#resource "aws_docdb_subnet_group" "ttrpg" {
+#  name       = "ttrpg-group"
+#  subnet_ids = [var.aws_subnet_one_id,var.aws_subnet_two_id]
+#}
+#
+#resource "aws_docdb_cluster" "ttrpg-mongo" {
+#  cluster_identifier              = "ttrpg-mongo"
+#  engine                          = "docdb"
+#  master_username                 = data.aws_ssm_parameter.mongo_user.value
+#  master_password                 = data.aws_ssm_parameter.mongo_pass.value
+#  vpc_security_group_ids          = [var.aws_sg_ec2_id]
+#  port                            = "27017"
+#  db_subnet_group_name            = aws_docdb_subnet_group.ttrpg.name
+#  skip_final_snapshot             = true
+#  backup_retention_period         = 1
+#  apply_immediately               = true
+#  enabled_cloudwatch_logs_exports = ["audit","profiler"]
+#}
+
+#resource "aws_docdb_cluster_instance" "ttrpg-mongo-instances" {
+#  count              = 1
+#  identifier         = "docdb-cluster-ttrpg-${count.index}"
+#  cluster_identifier = aws_docdb_cluster.ttrpg-mongo.id
+# instance_class     = "db.t3.medium"
+#}

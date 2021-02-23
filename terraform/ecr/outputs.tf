@@ -10,3 +10,6 @@ output "ii_repo_url" {
 output "pa_repo_url" {
   value = aws_ecr_repository.ttrpg-pa.repository_url
 }
+output "mongo_repo_url" {
+  value = aws_ecr_repository.ttrpg-mongo.repository_url
+}
