@@ -50,3 +50,7 @@ variable "aws_s3_secret_access_key" {
   description = "AWS s3 Secret Access Key"
   type        = string
 }
+variable "certificate" {
+  description = "AWS Certificate ARN"
+  type        = string
+}

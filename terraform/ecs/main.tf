@@ -539,7 +539,7 @@ resource "aws_ecs_task_definition" "ttrpg-dr-ecs-task-definition" {
       },
       {
         "name": "PUBLIC_URL",
-        "value": "http://${data.aws_ssm_parameter.dr_host.value}.${data.aws_ssm_parameter.domain.value}"
+        "value": "https://${data.aws_ssm_parameter.dr_host.value}.${data.aws_ssm_parameter.domain.value}"
       }
     ]
   }
@@ -729,31 +729,4 @@ resource "aws_docdb_cluster_instance" "ttrpg-mongo-instances" {
   identifier         = "docdb-cluster-ttrpg-${count.index}"
   cluster_identifier = aws_docdb_cluster.ttrpg-mongo.id
  instance_class     = "db.t3.medium"
-}
-
-resource "aws_route53_record" "dungeon-revealer" {
-  zone_id = var.aws_dns_zone_id
-  name    = data.aws_ssm_parameter.dr_host.value
-  type    = "CNAME"
-  ttl     = "60"
-
-  records = [var.aws_lb_dns_name]
-}
-
-resource "aws_route53_record" "improved-initiative" {
-  zone_id = var.aws_dns_zone_id
-  name    = data.aws_ssm_parameter.ii_host.value
-  type    = "CNAME"
-  ttl     = "60"
-
-  records = [var.aws_lb_dns_name]
-}
-
-resource "aws_route53_record" "paragon" {
-  zone_id = var.aws_dns_zone_id
-  name    = data.aws_ssm_parameter.pa_host.value
-  type    = "CNAME"
-  ttl     = "60"
-
-  records = [var.aws_lb_dns_name]
 }

@@ -128,31 +128,16 @@ module "create_codebuild" {
 #  aws_lb_target_id         = module.create_network.aws_lb_target_id
 #}
 
-#module "create_certifcate" {
-#  count = var.enable_acm_cloudfront ? 1 : 0
-#  source = "./certificate"
-#  providers = {
-#    aws = aws.ttrpg-1
-#  }
-#  use_dns_method  = var.use_dns_method
-#  aws_dns_zone_id = var.aws_dns_zone_id
-#  domain_name     = data.aws_ssm_parameter.domain.value
-#  dr_hostname     = data.aws_ssm_parameter.dr_host.value
-#  ii_hostname     = data.aws_ssm_parameter.ii_host.value
-#  pa_hostname     = data.aws_ssm_parameter.pa_host.value
-#
-#}
-
-#module "create_cloudfront" {
-#  count = var.enable_acm_cloudfront ? 1 : 0
-#  source = "./cloudfront"
-#  providers = {
-#    aws = aws.ttrpg
-#  }
-#  aws_region            = var.aws_region
-#  aws_dns_zone_id       = var.aws_dns_zone_id
-#  enable_aws_dns        = var.enable_aws_dns
-#  aws_lb_dns_name       = module.create_network.aws_lb_dns_name
-#  aws_lb_id             = module.create_network.aws_lb_id
-#  acm_certificate_arn   = module.create_certifcate.*.acm_certificate_arn[count.index]
-#}
+module "create_cloudfront" {
+  count = var.enable_acm_cloudfront ? 1 : 0
+  source = "./cloudfront"
+  providers = {
+    aws = aws.ttrpg
+  }
+  aws_region            = var.aws_region
+  aws_dns_zone_id       = var.aws_dns_zone_id
+  enable_aws_dns        = var.enable_aws_dns
+  aws_lb_dns_name       = module.create_network.aws_lb_dns_name
+  aws_lb_id             = module.create_network.aws_lb_id
+  acm_certificate_arn   = var.certificate
+}
