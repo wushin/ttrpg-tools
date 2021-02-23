@@ -1,37 +1,44 @@
-terraform {
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
-    }
+provider "aws" {
+  alias   = "ttrpg-root"
+  region  = var.aws_region
+  profile = "ttrpg-root"
+}
+
+module "lets_encrypt_cert" {
+  providers = {
+    aws = aws.ttrpg-root
   }
+
+  source  = "./terraform-aws-lets-encrypt/"
+  name    = "lets-encrypt-ttrpg"
+  domains = [
+    var.domain_name,
+    "*.${var.domain_name}",
+  ]
+
+  email_address  = var.domain_email
+  hosted_zone_id = var.aws_dns_zone_id
+  staging        = false
 }
 
-resource "aws_acm_certificate" "cert" {
-  domain_name               = var.domain_name
-  validation_method         = var.use_dns_method ? "DNS" : "EMAIL"
-  subject_alternative_names = [format("%s.%s", var.dr_hostname,var.domain_name),format("%s.%s", var.ii_hostname,var.domain_name),format("%s.%s", var.pa_hostname,var.domain_name)]
-  tags = {
-    Name = "ttrpg-tools-ssl"
-  }
+resource "aws_cloudwatch_event_rule" "cronjob" {
+  provider            = aws.ttrpg-root
+  name                = "ttrpg-ssl-cron"
+  schedule_expression = "cron(0 0 1 * ? *)"
 }
 
-resource "aws_acm_certificate_validation" "cert" {
-  count                   = var.use_dns_method ? 1 : 0
-  certificate_arn         = aws_acm_certificate.cert.arn
-  validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
+resource "aws_cloudwatch_event_target" "cronjob-target" {
+  provider  = aws.ttrpg-root
+  target_id = "lets-encrypt-ttrpg"
+  rule      = aws_cloudwatch_event_rule.cronjob.name
+  arn       = module.lets_encrypt_cert.lambda_function_arn
 }
 
-resource "aws_route53_record" "cert_validation" {
-  count           = var.use_dns_method ? 4 : 0
-  name            = aws_acm_certificate.cert.domain_validation_options.*.resource_record_name[count.index]
-  records         = [aws_acm_certificate.cert.domain_validation_options.*.resource_record_value[count.index]]
-  type            = aws_acm_certificate.cert.domain_validation_options.*.resource_record_type[count.index]
-  zone_id         = var.aws_dns_zone_id
-  allow_overwrite = true
-  ttl             = 60
-}
-
-resource "aws_acm_certificate_validation" "ttrpg-tools-ssl" {
-  count           = var.use_dns_method ? 0 : 1
-  certificate_arn = aws_acm_certificate.cert.arn
+resource "aws_lambda_permission" "allow_events" {
+  provider      = aws.ttrpg-root
+  statement_id  = "AWSEvents_ttrpg-ssl-cron"
+  action        = "lambda:InvokeFunction"
+  function_name = module.lets_encrypt_cert.lambda_function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.cronjob.arn
 }

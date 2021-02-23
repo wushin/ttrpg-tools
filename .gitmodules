@@ -7,3 +7,6 @@
 [submodule "paragon"]
 	path = paragon/code
 	url = https://github.com/cynicaloptimist/paragon.git
+[submodule "terraform-aws-lets-encrypt"]
+	path = terraform/certificate/terraform-aws-lets-encrypt
+	url = https://github.com/wushin/terraform-aws-lets-encrypt.git
