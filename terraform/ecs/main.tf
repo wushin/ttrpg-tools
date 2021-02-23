@@ -134,27 +134,6 @@ resource "aws_ssm_parameter" "ttrpg_ssm_pa" {
   value     = aws_efs_mount_target.mount-pa.ip_address
 }
 
-resource "aws_launch_configuration" "ecs_launch_config" {
-  image_id             = "ami-03aab79a35df660ba"
-  iam_instance_profile = "ecs-agent"
-  security_groups      = [var.aws_sg_alb_id]
-  user_data            = "#!/bin/bash\necho ECS_CLUSTER=ttrpg-cluster >> /etc/ecs/ecs.config"
-  instance_type        = "t2.micro"
-}
-
-resource "aws_autoscaling_group" "failure_analysis_ecs_asg" {
-  name                      = "asg"
-  vpc_zone_identifier       = [var.aws_subnet_one_id]
-  launch_configuration      = aws_launch_configuration.ecs_launch_config.name
-
-  desired_capacity          = 5
-  min_size                  = 5
-  max_size                  = 8
-  health_check_grace_period = 300
-  health_check_type         = "EC2"
-  capacity_rebalance        = true
-}
-
 resource "aws_service_discovery_private_dns_namespace" "ttrpg" {
   name        = "ttrpg.terraform.internal"
   description = "TTRPG container DNS"
@@ -236,8 +215,46 @@ resource "aws_service_discovery_service" "mongo" {
   }
 }
 
+resource "aws_launch_configuration" "ecs_launch_config" {
+  image_id             = "ami-03aab79a35df660ba"
+  iam_instance_profile = "ecs-agent"
+  security_groups      = [var.aws_sg_alb_id]
+  user_data            = "#!/bin/bash\necho ECS_CLUSTER=ttrpg-cluster >> /etc/ecs/ecs.config"
+  instance_type        = "t2.micro"
+}
+
+resource "aws_autoscaling_group" "failure_analysis_ecs_asg" {
+  name                      = "asg"
+  vpc_zone_identifier       = [var.aws_subnet_one_id]
+  launch_configuration      = aws_launch_configuration.ecs_launch_config.name
+
+  desired_capacity          = 5
+  min_size                  = 5
+  max_size                  = 8
+  health_check_grace_period = 300
+  health_check_type         = "EC2"
+  capacity_rebalance        = true
+}
+
+resource "aws_ecs_capacity_provider" "ttrpg-capacity-provider" {
+  name = "ttrpg-capacity-provider"
+
+  auto_scaling_group_provider {
+    auto_scaling_group_arn         = aws_autoscaling_group.failure_analysis_ecs_asg.arn
+    managed_termination_protection = "DISABLED"
+
+    managed_scaling {
+      maximum_scaling_step_size = 1000
+      minimum_scaling_step_size = 1
+      status                    = "ENABLED"
+      target_capacity           = 10
+    }
+  }
+}
+
 resource "aws_ecs_cluster" "ttrpg-cluster" {
-  name = "ttrpg-cluster"
+  name               = "ttrpg-cluster"
+  capacity_providers = [aws_ecs_capacity_provider.ttrpg-capacity-provider.name]
 }
 
 resource "aws_cloudwatch_log_group" "nginx" {
