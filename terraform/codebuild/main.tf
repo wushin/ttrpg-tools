@@ -410,11 +410,6 @@ resource "aws_codebuild_project" "ttrpg-tools-codebuild-nginx" {
     }
 
     environment_variable {
-      name  = "NGINX_EFS"
-      value = data.aws_ssm_parameter.nginx_efs.value
-    }
-
-    environment_variable {
       name  = "RESOLVER"
       value = data.aws_ssm_parameter.resolver.value
     }

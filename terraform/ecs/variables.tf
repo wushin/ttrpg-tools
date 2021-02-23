@@ -94,7 +94,3 @@ variable "s3_bucket_dr_task" {
   description = "s3 dr_data location"
   type        = string
 }
-variable "s3_bucket_nginx_task" {
-  description = "s3 nginx data location"
-  type        = string
-}

@@ -134,65 +134,6 @@ resource "aws_ssm_parameter" "ttrpg_ssm_pa" {
   value     = aws_efs_mount_target.mount-pa.ip_address
 }
 
-resource "aws_efs_file_system" "efs-nginx" {
-  tags = {
-    Name = "efs-nginx"
-  }
-}
-
-resource "aws_efs_mount_target" "mount-nginx" {
-  file_system_id  = aws_efs_file_system.efs-nginx.id
-  subnet_id       = var.aws_subnet_one_id
-  security_groups = [var.aws_sg_alb_id]
-}
-
-resource "aws_ssm_parameter" "ttrpg_ssm_nginx" {
-  overwrite = true
-  name      = "NGINX_EFS"
-  type      = "String"
-  value     = aws_efs_mount_target.mount-nginx.ip_address
-}
-
-resource "aws_datasync_location_efs" "nginx_data" {
-  efs_file_system_arn = aws_efs_mount_target.mount-nginx.file_system_arn
-  subdirectory        = "/letsencrypt/"
-
-  ec2_config {
-    security_group_arns = [var.aws_sg_ec2_arn,var.aws_sg_alb_arn]
-    subnet_arn          = var.aws_subnet_one_arn
-  }
-}
-
-resource "aws_cloudwatch_log_group" "backup_nginx" {
-  name = "backup_nginx"
-}
-
-resource "aws_datasync_task" "backup_nginx" {
-  destination_location_arn = var.s3_bucket_nginx_task
-  name                     = "backup_nginx"
-  source_location_arn      = aws_datasync_location_efs.nginx_data.arn
-  cloudwatch_log_group_arn = aws_cloudwatch_log_group.backup_nginx.arn
-
-  options {
-    bytes_per_second = -1
-  }
-}
-
-resource "aws_cloudwatch_log_group" "restore_nginx" {
-  name = "restore_nginx"
-}
-
-resource "aws_datasync_task" "restore_nginx" {
-  destination_location_arn = aws_datasync_location_efs.nginx_data.arn
-  name                     = "restore_nginx"
-  source_location_arn      = var.s3_bucket_nginx_task
-  cloudwatch_log_group_arn = aws_cloudwatch_log_group.restore_nginx.arn
-
-  options {
-    bytes_per_second = -1
-  }
-}
-
 resource "aws_launch_configuration" "ecs_launch_config" {
   image_id             = "ami-03aab79a35df660ba"
   iam_instance_profile = "ecs-agent"
@@ -359,14 +300,6 @@ resource "aws_ecs_task_definition" "ttrpg-nginx-ecs-task-definition" {
     }
   }
 
-  volume {
-    name = "efs-nginx"
-    efs_volume_configuration {
-      file_system_id = aws_efs_file_system.efs-nginx.id
-      root_directory = "/letsencrypt/"
-    }
-  }
-
   container_definitions    = <<EOF
 [
   {
@@ -390,10 +323,6 @@ resource "aws_ecs_task_definition" "ttrpg-nginx-ecs-task-definition" {
       }
     ],
     "mountPoints": [
-      {
-        "containerPath": "/etc/letsencrypt/",
-        "sourceVolume": "efs-nginx"
-      },
       {
         "containerPath": "/var/www/dungeon-revealer/",
         "sourceVolume": "efs-dr"

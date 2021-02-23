@@ -85,7 +85,6 @@ module "create_ecs" {
   aws_dns_zone_id          = var.aws_dns_zone_id
   aws_lb_dns_name          = module.create_network.aws_lb_dns_name
   s3_bucket_dr_task        = module.create_s3_backup.s3_bucket_dr_task
-  s3_bucket_nginx_task     = module.create_s3_backup.s3_bucket_nginx_task
 }
 
 module "create_codebuild" {

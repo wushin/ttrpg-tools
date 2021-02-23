@@ -7,6 +7,3 @@ output "s3_bucket" {
 output "s3_bucket_dr_task" {
     value = aws_datasync_location_s3.dr_data.arn
 }
-output "s3_bucket_nginx_task" {
-    value = aws_datasync_location_s3.letsencrypt.arn
-}

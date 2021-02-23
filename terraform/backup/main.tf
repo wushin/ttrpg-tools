@@ -85,18 +85,6 @@ resource "aws_s3_bucket" "ttrpg_bucket" {
   }
 }
 
-resource "aws_s3_bucket_object" "letsencrypt" {
-  bucket = aws_s3_bucket.ttrpg_bucket.id
-  acl    = "private"
-  key    = "letsencrypt/"
-  source = "/dev/null"
-
-  provisioner "local-exec" {
-    when    = create
-    command = var.restore_from_local ? "aws --profile ttrpg s3 sync ${var.module_depth}nginx/ssl/ s3://ttrpg-terraform-bucket/letsencrypt/" : "echo no restore"
-  }
-}
-
 resource "aws_s3_bucket_object" "dr_data" {
   bucket = aws_s3_bucket.ttrpg_bucket.id
   acl    = "private"
@@ -112,15 +100,6 @@ resource "aws_s3_bucket_object" "dr_data" {
 resource "aws_datasync_location_s3" "dr_data" {
   s3_bucket_arn = aws_s3_bucket.ttrpg_bucket.arn
   subdirectory  = "/dr_data"
-
-  s3_config {
-    bucket_access_role_arn = aws_iam_role.s3_access.arn
-  }
-}
-
-resource "aws_datasync_location_s3" "letsencrypt" {
-  s3_bucket_arn = aws_s3_bucket.ttrpg_bucket.arn
-  subdirectory  = "/letsencrypt"
 
   s3_config {
     bucket_access_role_arn = aws_iam_role.s3_access.arn

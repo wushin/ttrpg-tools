@@ -37,9 +37,6 @@ data "aws_ssm_parameter" "pa_host_cn" {
 data "aws_ssm_parameter" "pa_efs" {
   name = "PA_EFS"
 }
-data "aws_ssm_parameter" "nginx_efs" {
-  name = "NGINX_EFS"
-}
 data "aws_ssm_parameter" "resolver" {
   name = "RESOLVER"
 }
