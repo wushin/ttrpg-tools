@@ -1,7 +1,8 @@
 #!/bin/bash
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 sudo apt-get update
 sudo apt-get remove docker docker-engine docker.io containerd runc
-sudo apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common build-essential make libc6-dev groff less unzip
+sudo apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common build-essential make libc6-dev groff less unzip nfs-common
 curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
 sudo apt-get update

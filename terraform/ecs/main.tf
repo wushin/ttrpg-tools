@@ -733,29 +733,3 @@ resource "aws_ecs_task_definition" "ttrpg-mongo-ecs-task-definition" {
 ]
 EOF
 }
-
-#resource "aws_docdb_subnet_group" "ttrpg" {
-#  name       = "ttrpg-group"
-#  subnet_ids = [var.aws_subnet_one_id,var.aws_subnet_two_id]
-#}
-#
-#resource "aws_docdb_cluster" "ttrpg-mongo" {
-#  cluster_identifier              = "ttrpg-mongo"
-#  engine                          = "docdb"
-#  master_username                 = data.aws_ssm_parameter.mongo_user.value
-#  master_password                 = data.aws_ssm_parameter.mongo_pass.value
-#  vpc_security_group_ids          = [var.aws_sg_ec2_id]
-#  port                            = "27017"
-#  db_subnet_group_name            = aws_docdb_subnet_group.ttrpg.name
-#  skip_final_snapshot             = true
-#  backup_retention_period         = 1
-#  apply_immediately               = true
-#  enabled_cloudwatch_logs_exports = ["audit","profiler"]
-#}
-
-#resource "aws_docdb_cluster_instance" "ttrpg-mongo-instances" {
-#  count              = 1
-#  identifier         = "docdb-cluster-ttrpg-${count.index}"
-#  cluster_identifier = aws_docdb_cluster.ttrpg-mongo.id
-# instance_class     = "db.t3.medium"
-#}

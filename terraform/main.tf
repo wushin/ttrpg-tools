@@ -106,27 +106,29 @@ module "create_codebuild" {
   aws_sg_alb_id            = module.create_network.aws_sg_alb_id
 }
 
-#module "create_ec2" {
-#  depends_on = [
-#    module.create_s3_backup.aws_s3_bucket,
-#  ]
-#  source = "./ec2"
-#  providers = {
-#    aws = aws.ttrpg
-#  }
-#  aws_region               = var.aws_region
-#  module_depth             = "../"
-#  instance_type            = var.instance_type
-#  sshpath                  = var.sshpath
-#  private_key_name         = var.private_key_name
-#  public_key_name          = var.public_key_name
-#  git_user                 = var.git_user
-#  aws_s3_access_key_id     = var.aws_s3_access_key_id
-#  aws_s3_secret_access_key = var.aws_s3_secret_access_key
-#  aws_sg_ec2_id            = module.create_network.aws_sg_ec2_id
-#  aws_subnet_one_id        = module.create_network.aws_subnet_one_id
-#  aws_lb_target_id         = module.create_network.aws_lb_target_id
-#}
+module "create_ec2" {
+  depends_on = [
+    module.create_s3_backup.aws_s3_bucket,
+  ]
+  source = "./ec2"
+  providers = {
+    aws = aws.ttrpg
+  }
+  aws_region               = var.aws_region
+  module_depth             = "../"
+  instance_type            = var.instance_type
+  sshpath                  = var.sshpath
+  private_key_name         = var.private_key_name
+  public_key_name          = var.public_key_name
+  git_user                 = var.git_user
+  aws_s3_access_key_id     = var.aws_s3_access_key_id
+  aws_s3_secret_access_key = var.aws_s3_secret_access_key
+  aws_sg_ec2_id            = module.create_network.aws_sg_ec2_id
+  aws_subnet_one_id        = module.create_network.aws_subnet_one_id
+  aws_lb_target_id         = module.create_network.aws_lb_target_id
+  aws_sg_alb_id            = module.create_network.aws_sg_alb_id
+  aws_dns_zone_id          = var.aws_dns_zone_id
+}
 
 module "create_cloudfront" {
   count = var.enable_acm_cloudfront ? 1 : 0

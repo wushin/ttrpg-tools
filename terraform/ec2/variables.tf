@@ -46,3 +46,11 @@ variable "aws_lb_target_id" {
   description = "ec2 loadbalancer target group"
   type        = string
 }
+variable "aws_sg_alb_id" {
+  description = "ec2 loadbalancer target group"
+  type        = string
+}
+variable "aws_dns_zone_id" {
+  description = "DNS zone id"
+  type        = string
+}
