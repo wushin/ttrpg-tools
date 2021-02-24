@@ -85,7 +85,7 @@ resource "aws_codebuild_project" "ttrpg-tools-codebuild-dr" {
   name          = "ttrpg-tools-dr"
   description   = "Dungeon Revealer Codebuild"
   build_timeout = "60"
-  service_role  = aws_iam_role.codebuild_execution_role.name
+  service_role  = aws_iam_role.codebuild_execution_role.arn
 
   artifacts {
     type = "NO_ARTIFACTS"
@@ -172,7 +172,7 @@ resource "aws_codebuild_project" "ttrpg-tools-codebuild-ii" {
   name          = "ttrpg-tools-ii"
   description   = "Improved Initiative Codebuild"
   build_timeout = "60"
-  service_role  = aws_iam_role.codebuild_execution_role.name
+  service_role  = aws_iam_role.codebuild_execution_role.arn
 
   artifacts {
     type = "NO_ARTIFACTS"
@@ -249,7 +249,7 @@ resource "aws_codebuild_project" "ttrpg-tools-codebuild-pa" {
   name          = "ttrpg-tools-pa"
   description   = "Paragon Codebuild"
   build_timeout = "60"
-  service_role  = aws_iam_role.codebuild_execution_role.name
+  service_role  = aws_iam_role.codebuild_execution_role.arn
 
   artifacts {
     type = "NO_ARTIFACTS"
@@ -316,7 +316,7 @@ resource "aws_codebuild_project" "ttrpg-tools-codebuild-nginx" {
   name          = "ttrpg-tools-nginx"
   description   = "Nginx Codebuild"
   build_timeout = "60"
-  service_role  = aws_iam_role.codebuild_execution_role.name
+  service_role  = aws_iam_role.codebuild_execution_role.arn
 
   artifacts {
     type = "NO_ARTIFACTS"
@@ -453,7 +453,7 @@ resource "aws_codebuild_project" "ttrpg-tools-codebuild-dr-restore" {
   name          = "ttrpg-tools-dr-restore"
   description   = "Dungeon Revealer Restore"
   build_timeout = "60"
-  service_role  = aws_iam_role.codebuild_execution_role.name
+  service_role  = aws_iam_role.codebuild_execution_role.arn
 
   artifacts {
     type = "NO_ARTIFACTS"
