@@ -2,6 +2,9 @@
 Terraform and AWS Build
 =======================
 
+Creates a auto-scaling ECS cluster of 5 t2.micro instances, codebuilds, datasync backup/restore scripts, Cloudfront w/Let's Encrypt SSL auto-updated by a Lambda script, route53 DNS records and a Bastion server (Jumphost)
+
+
 ## Prerequisites:
   * Terraform [Mac Install](https://learn.hashicorp.com/tutorials/terraform/install-cli) [Linux Install](https://learn.hashicorp.com/tutorials/terraform/install-cli)
   * AWS Cli [Mac Install](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-mac.html) [Linux Install](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux.html)
@@ -50,11 +53,28 @@ aws_access_key_id = <Access Key ID>
 aws_secret_access_key = <Access Key Secret>
 ```
 
+
+## Create System Manager Parameter Store Values (Cloud ENV variables)
+  * SSM 
+      * Make sure you have the .env file at the root of this project filled out
+      * `cd ./terraform/ssm/`
+      * `terraform init`
+      * `cp aws-build.tfvars.sample aws-build.tfvars`
+      * `terraform apply -var-file="aws-build.tfvars" -auto-approve`
+
 ## Create a route53 domain and records (optional)
   * DNS (route53)
     * Register a Domain with route53 using the console with your main account login
       * [Route53](https://console.aws.amazon.com/route53/home#DomainListing:)
     * Leave the base Base Zone Record created
+
+## Create a cert to use with Cloudfront
+  * Certificate (ACM & Let's Encrypt)
+    * DNS (route53)
+      * `cd ./terraform/certificates/`
+      * `terraform init`
+      * `cp aws-build.tfvars.sample aws-build.tfvars`
+      * `terraform apply -var-file="aws-build.tfvars" -auto-approve`
 
 ## Build Project
   * Build
@@ -66,9 +86,6 @@ aws_secret_access_key = <Access Key Secret>
 ### aws-build.tfvars defined
 Name | Value | Explanation
 -----|-------|-------------
-enable_acm_cloudfront | true/false | Whether or not to use cloudfront
-enable_aws_dns | true/false | Whether or not cloudfront should add DNS record to route53
-use_dns_method | true/false | Whether to use DNS or EMAIL for certificate validation
 restore_from_local | true/false | Whether or not to use this local repo to seed s3
 aws_region | AWS Region | Region services will be located
 instance_type | Instance Type | [Instance Type](https://aws.amazon.com/ec2/instance-types/)
@@ -78,11 +95,7 @@ public_key_name | some_ssh_public_keyname | Public SSH Key Name
 git_user | git repo user | Your github repo user
 aws_s3_access_key_id | ttrpg_s3_access_key_id | ttrpg-s3 Access Key ID
 aws_s3_secret_access_key | ttrpg_s3_access_key_secret | ttrpg-s3 Access Secret Key
-domain_name | domain.org | Domain Name you have registered
 aws_dns_zone_id | ZAJHSK7867860 | Zone Id from route53 hosted zones record that matches the domain
-dr_hostname | maps | Sub-domain of Dungeon Revealer Host
-ii_hostname | impinit | Sub-domain of Improved Initiative Host
-pa_hostname | paragon | Sub-domain of Paragon Host
 
 
 ## All Done! 
@@ -138,25 +151,19 @@ aws_s3_access_key_id | ttrpg_s3_access_key_id | ttrpg-s3 Access Key ID
 aws_s3_secret_access_key | ttrpg_s3_access_key_secret | ttrpg-s3 Access Secret Key
       
 
-  * Certificate (ACM) (optional)
+  * Certificate (ACM & Let's Encrypt)
     * DNS (route53)
       * `cd ./terraform/certificates/`
       * `terraform init`
       * `cp aws-build.tfvars.sample aws-build.tfvars`
       * `terraform apply -var-file="aws-build.tfvars" -auto-approve`
-    * Email (Suggested for non-route53 domains)
-      * Same as above except set use_dns_method false
-        * `use_dns_method  = false`
 
 ### aws-build.tfvars defined
 Name | Value | Explanation
 -----|-------|-------------
-use_dns_method | true/false | Whether to use DNS or EMAIL for certificate validation
 domain_name | domain.org | Domain Name you have registered
+domain_email | your@email.com | Recovery email for Let's Encrypt
 aws_dns_zone_id | ZAJHSK7867860 | Zone Id from route53 hosted zones record that matches the domain
-dr_hostname | maps | Sub-domain of Dungeon Revealer Host
-ii_hostname | impinit | Sub-domain of Improved Initiative Host
-pa_hostname | paragon | Sub-domain of Paragon Host
 
 
   * Cloudfront (Cloudfront) (optional)
@@ -167,22 +174,13 @@ pa_hostname | paragon | Sub-domain of Paragon Host
       * `terraform apply -var-file="aws-build.tfvars" -auto-approve`
       * cloudfront_dns result will automatically be added to your DNS for each host
 
-    * Manual DNS (Suggested for non-route53 domains)
-      * Same as above except set enable_aws_dns false
-        `enable_aws_dns        = false`
-      * cloudfront_dns will return as a output. Use this for your hosts as a CNAME record.
-
 
 ### aws-build.tfvars defined
 Name | Value | Explanation
 -----|-------|-------------
-enable_aws_dns | true/false | Whether or not cloudfront should add DNS record to route53
 aws_region | AWS Region | Region services will be located
 domain_name | domain.org | Domain Name you have registered
 aws_dns_zone_id | ZAJHSK7867860 | Zone Id from route53 hosted zones record that matches the domain
-dr_hostname | maps | Sub-domain of Dungeon Revealer Host
-ii_hostname | impinit | Sub-domain of Improved Initiative Host
-pa_hostname | paragon | Sub-domain of Paragon Host
 aws_lb_dns_name | aws_lb_dns_name | aws_lb_dns_name from outputs of server terraform
 aws_lb_id | aws_lb_id | aws_lb_id from outputs of server terraform
 acm_certificate_arn | acm_certificate_arn | acm_certificate_arn from outputs of certificate terraform

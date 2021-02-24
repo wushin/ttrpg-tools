@@ -27,8 +27,9 @@ server {
     }
 
     location /dm {
-        rewrite ^(/.*)$ $1 break;
-        proxy_pass http://dungeon-revealer-host/dm;
+        rewrite ^/dm(/.*)$ $1 break;
+        set $dr_host http://${DR_HOST_CN}:3000/;
+        proxy_pass $dr_host;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -38,7 +39,8 @@ server {
 
     location /map {
         rewrite ^/map(/.*)$ $1 break;
-        proxy_pass http://dungeon-revealer-host/;
+        set $dr_host http://${DR_HOST_CN}:3000/;
+        proxy_pass $dr_host;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -52,7 +54,8 @@ server {
     }
 
     location @dungeon-revealer {
-        proxy_pass http://dungeon-revealer-host;
+        set $dr_host http://${DR_HOST_CN}:3000/;
+        proxy_pass $dr_host;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -97,7 +100,8 @@ server {
     }
 
     location @improved-initiative {
-        proxy_pass http://improved-initiative-host;
+        set $ii_host http://${II_HOST_CN}:4000;
+        proxy_pass $ii_host;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -138,7 +142,8 @@ server {
     }
 
     location @paragon {
-        proxy_pass http://paragon-host;
+        set $pa_host http://${PA_HOST_CN}:3000;
+        proxy_pass $pa_host;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";

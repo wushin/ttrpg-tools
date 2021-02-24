@@ -1,15 +1,16 @@
-output "s3_bucket_domain_name" {
-    value = module.create_s3_backup.s3_bucket_domain_name
+output "improved-initiative" {
+  value       = module.create_cloudfront.improved-initiative
+  description = "The hostname for improved-initiative"
 }
-output "cloudfront_dns" {
- value        = var.enable_acm_cloudfront ? module.create_cloudfront.*.cloudfront_dns[0] : null
-  description = "The DNS name of the ttrpgtools server"
+output "dungeon-revealer" {
+  value       = module.create_cloudfront.dungeon-revealer
+  description = "The hostname for dungeon-revealer"
 }
-output "public_ip" {
-  value       = module.create_ec2_alb_vpc.public_ip
-  description = "The public IP of the ttrpgtools server"
+output "paragon" {
+  value       = module.create_cloudfront.paragon
+  description = "The hostname for paragon"
 }
-output "aws_lb_dns_name" {
-  value       = module.create_ec2_alb_vpc.aws_lb_dns_name
-  description = "DNS name for load balancer"
+output "bastion" {
+  value       = module.create_ec2.bastion
+  description = "The hostname for bastion"
 }
