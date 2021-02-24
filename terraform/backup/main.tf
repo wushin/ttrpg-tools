@@ -6,6 +6,72 @@ terraform {
   }
 }
 
+resource "aws_iam_role" "s3_access" {
+  name = "AWSDataSyncS3BucketAccess-ttrpg-terraform-bucket"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "datasync.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "s3_access" {
+  name = "AWSDataSyncS3BucketAccess-ttrpg-terraform-bucket"
+
+  policy = <<POLICY
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "s3:GetBucketLocation",
+                "s3:ListBucket",
+                "s3:ListBucketMultipartUploads"
+            ],
+            "Effect": "Allow",
+            "Resource": "arn:aws:s3:::ttrpg-terraform-bucket"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:PutLogEvents",
+                "logs:CreateLogStream"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Action": [
+                "s3:AbortMultipartUpload",
+                "s3:DeleteObject",
+                "s3:GetObject",
+                "s3:ListMultipartUploadParts",
+                "s3:PutObjectTagging",
+                "s3:GetObjectTagging",
+                "s3:PutObject"
+            ],
+            "Effect": "Allow",
+            "Resource": "arn:aws:s3:::ttrpg-terraform-bucket/*"
+        }
+    ]
+}
+POLICY
+}
+
+resource "aws_iam_role_policy_attachment" "s3_access" {
+  role       = aws_iam_role.s3_access.name
+  policy_arn = aws_iam_policy.s3_access.arn
+}
+
 resource "aws_s3_bucket" "ttrpg_bucket" {
   bucket = "ttrpg-terraform-bucket"
   acl    = "private"
@@ -19,45 +85,23 @@ resource "aws_s3_bucket" "ttrpg_bucket" {
   }
 }
 
-resource "aws_s3_bucket_object" "letsencrypt" {
-  bucket = aws_s3_bucket.ttrpg_bucket.id
-  acl    = "private"
-  key    = "letsencrypt/"
-  source = "/dev/null"
-}
-
-resource "aws_s3_bucket_object" "letsencrypt_objects" {
-  for_each = var.restore_from_local ? fileset("${var.module_depth}nginx/ssl/", "**") : []
-  bucket = aws_s3_bucket.ttrpg_bucket.id
-  key = "letsencrypt/${each.value}"
-  source = "${var.module_depth}nginx/ssl/${each.value}"
-}
-
-resource "aws_s3_bucket_object" "mongo_data" {
-  bucket = aws_s3_bucket.ttrpg_bucket.id
-  acl    = "private"
-  key    = "mongo_data/"
-  source = "/dev/null"
-}
-
-resource "aws_s3_bucket_object" "mongo_data_objects" {
-  for_each = var.restore_from_local ? fileset("${var.module_depth}mongo/data/", "**") : []
-  bucket = aws_s3_bucket.ttrpg_bucket.id
-  key = "mongo_data/${each.value}"
-  source = "${var.module_depth}mongo/data/${each.value}"
-}
-
 resource "aws_s3_bucket_object" "dr_data" {
   bucket = aws_s3_bucket.ttrpg_bucket.id
   acl    = "private"
   key    = "dr_data/"
   source = "/dev/null"
+
+  provisioner "local-exec" {
+    when    = create
+    command = var.restore_from_local ? "aws --profile ttrpg s3 sync ${var.module_depth}dungeon-revealer/data/ s3://ttrpg-terraform-bucket/dr_data/" : "echo no restore"
+  }
 }
 
-resource "aws_s3_bucket_object" "dr_data_objects" {
-  for_each = var.restore_from_local ? fileset("${var.module_depth}dungeon-revealer/data/", "**") : []
-  bucket = aws_s3_bucket.ttrpg_bucket.id
-  key = "dr_data/${each.value}"
-  source = "${var.module_depth}dungeon-revealer/data/${each.value}"
-}
+resource "aws_datasync_location_s3" "dr_data" {
+  s3_bucket_arn = aws_s3_bucket.ttrpg_bucket.arn
+  subdirectory  = "/dr_data"
 
+  s3_config {
+    bucket_access_role_arn = aws_iam_role.s3_access.arn
+  }
+}

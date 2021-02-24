@@ -1,0 +1,55 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      python: 3.7
+    commands:
+      - python --version
+  pre_build:
+    commands:
+      - export STARTTIME=`date +%s`
+      - export BUILDNAME="$GIT_BRANCH-`date +%Y-%m-%d`"
+      - export BRANCH="$GIT_BRANCH"
+      - export SOURCE_VERSION="$CODEBUILD_SOURCE_VERSION"
+      - echo "BRANCH $BRANCH"
+      - echo "SOURCE_VERSION $SOURCE_VERSION"
+      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+      - IMAGE_TAG=build-$(git rev-parse HEAD)
+  build:
+    commands:
+      - curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+      - apt-get -y update
+      - apt-get install -y nfs-common
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - echo $REPOURL:latest $REPOURL:$IMAGE_TAG
+      - docker build -t dungeon-revealer --build-arg PC_PASSWORD=$PC_PASSWORD --build-arg DM_PASSWORD=$DM_PASSWORD --build-arg PUBLIC_URL="/map" ./dungeon-revealer/
+      - docker tag dungeon-revealer:latest $REPOURL:latest
+      - docker tag dungeon-revealer:latest $REPOURL:$IMAGE_TAG
+      - docker images 
+      - docker create dungeon-revealer
+      - CONTAINER=$(docker ps -a | grep dungeon-revealer | awk '{print $1}')
+      - docker ps -a 
+      - echo $CONTAINER
+      - mkdir ./build/ ./data/
+      - mount -t nfs -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport $DR_EFS:/ ./build/
+      - mount -t nfs -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport $DR_EFS_DATA:/ ./data/
+      - docker start $CONTAINER
+      - docker stop $CONTAINER
+      - docker cp -a $CONTAINER:/usr/src/app/build/ ./build/
+      - docker cp -a $CONTAINER:/usr/src/app/data/ ./data/
+      - chown 1000:1000 -R ./build/ ./data/
+      - sleep 3
+      - echo Pushing the Docker images...
+      - echo $REPOURL/dungeon-revealer:latest $REPOURL:$IMAGE_TAG
+      - docker push $REPOURL:latest
+      - docker push $REPOURL:$IMAGE_TAG
+      - aws ecs update-service --force-new-deployment --service dungeon-revealer --cluster ttrpg-cluster
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - pwd
+      - ls -al
+artifacts:
+  files:
+    - '**/*'

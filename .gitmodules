@@ -1,9 +1,12 @@
 [submodule "dungeon-revealer"]
 	path = dungeon-revealer/code
-	url = git@github.com:dungeon-revealer/dungeon-revealer.git
+	url = https://github.com/dungeon-revealer/dungeon-revealer.git
 [submodule "improved-initiative"]
 	path = improved-initiative/code
-	url = git@github.com:cynicaloptimist/improved-initiative.git
+	url = https://github.com/cynicaloptimist/improved-initiative.git
 [submodule "paragon"]
 	path = paragon/code
-	url = git@github.com:cynicaloptimist/paragon.git
+	url = https://github.com/cynicaloptimist/paragon.git
+[submodule "terraform-aws-lets-encrypt"]
+	path = terraform/certificate/terraform-aws-lets-encrypt
+	url = https://github.com/wushin/terraform-aws-lets-encrypt.git

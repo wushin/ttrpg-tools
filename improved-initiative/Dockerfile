@@ -11,3 +11,5 @@ RUN npm install -g grunt
 RUN npm install
 RUN grunt --no-color copy
 RUN grunt --no-color build_dev
+VOLUME ["/usr/src/app/public"]
+EXPOSE 4000

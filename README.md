@@ -15,7 +15,13 @@ TTRPG Tools
   * [Dungeon Revealer](https://github.com/dungeon-revealer/dungeon-revealer) - Uses images to display dungeon and battle maps with fog of war
   * [Improved Initiative](https://github.com/cynicaloptimist/improved-initiative) - Combat tracker for Dungeons and Dragons (D&D) 5th Edition
   * [Paragon](https://github.com/cynicaloptimist/paragon) - Configurable DM screen to use when running a tabletop RPGs
+
+* Other Software/Services Used
+  * [Docker & Docker-compose](https://www.docker.com/) - Package Software into Standardized Units for Development, Shipment and Deployment
+  * [Terraform](https://www.terraform.io/) - An open-source infrastructure as code software tool
   * [Let's Encrypt](https://letsencrypt.org/) - A free ssl service
+  * [MongoDB](https://www.mongodb.com/) - A general purpose, document-based, distributed database
+  * [AWS](https://aws.amazon.com/) - Amazon Cloud Services
 
 ## Prerequisites:
 * Local Docker Build
@@ -59,8 +65,11 @@ TTRPG Tools
 * `DOMAIN` - The domain all the hosts will bind too
 * `DOMAIN_EMAIL` - The Email address Let's Encrypt will notify you when the ssl is about to expire
 * `DR_HOST` - The hostname for Dungeon Revealer
+* `DR_HOST_CN` - The hostname for Dungeon Revealer
 * `II_HOST` - The hostname for Improved Initiative
+* `II_HOST_CN` - The hostname for Improved Initiative
 * `PA_HOST` - The hostname for Paragon
+* `PA_HOST_CN` - The hostname for Paragon
 * `SSL` - `nossl` to not use ssl and `ssl` to use ssl
 * `HTACCESS` - `yes` to set-up auth with separate player and gm password and `no` to not set-up auth
 * `HT_USER` - The name the players will use to login
@@ -69,6 +78,7 @@ TTRPG Tools
 * `DR_DM_PASS` - The password the DM will use to login
 * `MONGO_INITDB_ROOT_USERNAME` - Name for root user of Mongo db
 * `MONGO_INITDB_ROOT_PASSWORD` - Password for root user of Mongo db
+* `RESOLVER` - `127.0.0.11` for Docker Build or `10.0.0.2` for AWS Build
 
 ## Scripts
 * `make install`, `make build`, `bash set-up.sh build`
