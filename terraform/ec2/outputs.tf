@@ -1,4 +1,4 @@
-output "public_ip" {
-  value       = aws_instance.ttrpgserver.public_ip
+output "bastion" {
+  value       = aws_route53_record.bastion.fqdn
   description = "The public IP of the ttrpgtools server"
 }

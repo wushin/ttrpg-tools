@@ -73,7 +73,6 @@ resource "aws_cloudfront_distribution" "ttrpg_distribution" {
 }
 
 resource "aws_route53_record" "www" {
-  count = var.enable_aws_dns ? 1 : 0
   zone_id = var.aws_dns_zone_id
   name    = "www"
   type    = "CNAME"
@@ -83,7 +82,6 @@ resource "aws_route53_record" "www" {
 }
 
 resource "aws_route53_record" "dungeon-revealer" {
-  count = var.enable_aws_dns ? 1 : 0
   zone_id = var.aws_dns_zone_id
   name    = data.aws_ssm_parameter.dr_host.value
   type    = "CNAME"
@@ -93,7 +91,6 @@ resource "aws_route53_record" "dungeon-revealer" {
 }
 
 resource "aws_route53_record" "improved-initiative" {
-  count = var.enable_aws_dns ? 1 : 0
   zone_id = var.aws_dns_zone_id
   name    = data.aws_ssm_parameter.ii_host.value
   type    = "CNAME"
@@ -103,7 +100,6 @@ resource "aws_route53_record" "improved-initiative" {
 }
 
 resource "aws_route53_record" "paragon" {
-  count = var.enable_aws_dns ? 1 : 0
   zone_id = var.aws_dns_zone_id
   name    = data.aws_ssm_parameter.pa_host.value
   type    = "CNAME"

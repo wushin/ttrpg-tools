@@ -22,18 +22,6 @@ variable "git_user" {
   description = "Github account"
   type        = string
 }
-variable "enable_acm_cloudfront" {
-  description = "Whether or not to use cloudfront"
-  type        = bool
-}
-variable "enable_aws_dns" {
-  description = "Turns AWS DNS route adding off"
-  type        = bool
-}
-variable "use_dns_method" {
-  description = "Which method DNS or EMAIL for validation"
-  type        = bool
-}
 variable "restore_from_local" {
   description = "Whether or not to restore from this local build"
   type        = bool

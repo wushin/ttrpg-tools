@@ -2,10 +2,6 @@ variable "aws_region" {
   description = "Region services should spawn in"
   type        = string
 }
-variable "enable_aws_dns" {
-  description = "Turns AWS DNS route adding off"
-  type        = bool
-}
 variable "aws_dns_zone_id" {
   description = "Route53 zone file ID"
   type        = string
