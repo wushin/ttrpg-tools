@@ -32,6 +32,7 @@ http {
 
     sendfile        on;
     tcp_nopush     on;
+    client_max_body_size 5M;
 
     keepalive_timeout  65;
 

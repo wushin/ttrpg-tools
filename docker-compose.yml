@@ -17,7 +17,6 @@ services:
     environment:
       - PC_PASSWORD=${DR_USER_PASS}
       - DM_PASSWORD=${DR_DM_PASS}
-      - PUBLIC_URL="/map"
     volumes:
       - ./dungeon-revealer/data:/usr/src/app/data
       - ./dungeon-revealer/build/:/usr/src/app/build-export:rw
@@ -100,8 +99,9 @@ services:
       - SSL
       - RESOLVER
     volumes:
-      - ./nginx/files/:/etc/nginx/
-      - ./nginx/ssl/:/etc/letsencrypt/
+      - ./nginx/files/:/etc/nginx/:rw
+      - ./nginx/ssl/:/etc/letsencrypt/:rw
+      - ./nginx/files/img/:/var/www/img/:rw
       - ./dungeon-revealer/build/:/var/www/dungeon-revealer/:rw,cached
       - ./improved-initiative/public-tmp/:/var/www/improved-initiative/:rw
       - ./paragon/build/:/var/www/paragon/:rw

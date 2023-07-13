@@ -1,5 +1,5 @@
 server {
-    listen       80 default_server;
+    listen       80;
     server_name  ${DOMAIN};
 
     location /nginx-health {
@@ -9,6 +9,20 @@ server {
     location / {
         root /var/www/;
         try_files /$uri /$uri/ =404;
+    }
+}
+
+server {
+    listen       80 default_server;
+    server_name  www.${DOMAIN};
+
+    location /nginx-health {
+        return 200 "healthy\n";
+    }
+
+    location / {
+        root /var/www/;
+        try_files /img/$uri /$uri /$uri/ =404;
     }
 }
 
