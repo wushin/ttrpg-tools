@@ -66,4 +66,5 @@ echo -e "[ \e[35mAll ready to use\e[0m ]"
 echo "Improved Initiative : "$HTTP""$II_HOST"."$DOMAIN;
 echo "Dungeon Revealer    : "$HTTP""$DR_HOST"."$DOMAIN"/map";
 echo "Paragon             : "$HTTP""$PA_HOST"."$DOMAIN;
+echo "File Serve          : "$HTTP"www."$DOMAIN;
 echo ""
